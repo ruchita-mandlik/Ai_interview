@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Coding Assessment — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interview.css">
+  <link rel="stylesheet" href="css/coding-interview.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="background-color: #0F172A; margin: 0; padding: 0; overflow: hidden;">
+  <!-- IDE Top Header -->
+  <header class="interview-header" style="background-color: #0F172A; border-bottom: 1px solid #1E293B; color: #F8FAFC;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="dashboard.html" style="color: #94A3B8; text-decoration: none; font-size: 1.2rem;">← Exit</a>
+      <h2 id="interview-title" style="font-size: 1.1rem; font-weight: 700; color: #F8FAFC; margin: 0;">AI Coding Interview</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span class="timer-badge" id="coding-timer" style="background-color: #1E293B; color: #38BDF8; border: 1px solid #334155;">⏱ 20:00</span>
+      <button id="header-submit-btn" class="btn btn-primary" style="padding: 8px 20px; font-weight: 700;">Submit Solution</button>
+    </div>
+  </header>
+
+  <!-- IDE Container Split View -->
+  <div class="coding-ide-container">
+    <!-- Left Pane: Problem Description -->
+    <div class="coding-problem-pane">
+      <div class="problem-header">
+        <div class="problem-title-row">
+          <span class="problem-title" id="problem-title">Loading Coding Problem...</span>
+          <span class="badge-difficulty badge-medium" id="problem-difficulty">Medium</span>
+        </div>
+        <div style="font-size: 0.85rem; color: #94A3B8; display: flex; gap: 16px;">
+          <span>Topic: <strong id="problem-topic" style="color: #38BDF8;">Algorithms</strong></span>
+          <span>Role: <strong id="problem-role" style="color: #CBD5E1;">Software Engineer</strong></span>
+        </div>
+      </div>
+
+      <div class="problem-body">
+        <div>
+          <div class="problem-section-title">Problem Description</div>
+          <div id="problem-description-text" style="white-space: pre-line;">Generating role-specific problem description...</div>
+        </div>
+
+        <div id="constraints-container">
+          <div class="problem-section-title">Constraints</div>
+          <div id="problem-constraints" style="font-family: monospace; background: #1E293B; padding: 10px; border-radius: 6px; font-size: 0.85rem;">
+            1 &lt;= N &lt;= 10^5
+          </div>
+        </div>
+
+        <div>
+          <div class="problem-section-title">Sample Test Cases</div>
+          <div id="sample-test-cases-container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered Sample Cases -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Pane: Code Editor & Execution Drawer -->
+    <div class="coding-editor-pane">
+      <div class="editor-toolbar">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 0.85rem; color: #94A3B8; font-weight: 600;">Language:</span>
+          <select id="editor-language" class="lang-selector">
+            <option value="python">Python 3</option>
+            <option value="javascript">JavaScript (Node.js)</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+          </select>
+        </div>
+        <div class="editor-actions">
+          <button id="reset-code-btn" style="background: transparent; color: #94A3B8; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem;">
+            ↺ Reset Starter Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Code Textarea -->
+      <div class="code-editor-area">
+        <textarea id="code-textarea" class="code-textarea" spellcheck="false" placeholder="# Write your code solution here..."></textarea>
+      </div>
+
+      <!-- Execution Panel Bottom Drawer -->
+      <div class="execution-drawer">
+        <div class="drawer-header">
+          <span>TEST EXECUTION CONSOLE</span>
+          <div style="display: flex; gap: 10px;">
+            <button id="run-tests-btn" style="background-color: #334155; color: #F8FAFC; border: none; border-radius: 6px; padding: 6px 16px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+              ▶ Run Sample Tests
+            </button>
+            <button id="drawer-submit-btn" style="background-color: #2563EB; color: #FFFFFF; border: none; border-radius: 6px; padding: 6px 16px; font-weight: 700; cursor: pointer; font-size: 0.85rem;">
+              🚀 Submit Final Code
+            </button>
+          </div>
+        </div>
+
+        <div class="drawer-body" id="drawer-body">
+          <div style="color: #64748B; font-size: 0.85rem; font-style: italic;">
+            Click "Run Sample Tests" to execute your solution against sample inputs, or "Submit Final Code" for comprehensive test suite & AI evaluation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/coding-interview.js"></script>
+</body>
+</html>

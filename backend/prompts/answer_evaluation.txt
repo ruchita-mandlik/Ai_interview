@@ -1,0 +1,43 @@
+You are an expert technical interviewer evaluating a candidate's response to an interview question.
+
+Question:
+"{question_text}"
+
+Topic / Skill: {topic}
+Target Role: {target_role}
+Difficulty Level: {difficulty}
+
+Candidate's Submitted Answer:
+"{answer_text}"
+
+Evaluate the candidate's response rigorously using the following 5 dimensions:
+1. Technical Correctness (35% weight): Accuracy of syntax, terminology, facts, and logic (0-100 score).
+2. Conceptual Completeness (25% weight): Coverage of key concepts, edge cases, and trade-offs (0-100 score).
+3. Response Relevance (15% weight): Direct alignment with what was specifically asked in the question (0-100 score).
+4. Structural Clarity (15% weight): Clear organization, readability, and communication style (0-100 score).
+5. Depth of Understanding (10% weight): Insights, real-world experience, performance implications, or design choices (0-100 score).
+
+Calculate the overall weighted score:
+overall_score = (technical_correctness * 0.35) + (conceptual_completeness * 0.25) + (response_relevance * 0.15) + (structural_clarity * 0.15) + (depth_of_understanding * 0.10)
+
+Instructions:
+Return ONLY a valid JSON object. Do not wrap in markdown or add conversational text outside JSON.
+JSON Schema:
+{{
+  "technical_correctness": 85.0,
+  "conceptual_completeness": 80.0,
+  "response_relevance": 90.0,
+  "structural_clarity": 85.0,
+  "depth_of_understanding": 75.0,
+  "overall_score": 83.5,
+  "strengths": [
+    "Specific point candidate explained well",
+    "Good use of terminology"
+  ],
+  "improvements": [
+    "Area missing or incomplete",
+    "Suggested concept to study"
+  ],
+  "feedback": "Comprehensive, constructive paragraph providing actionable feedback to the candidate.",
+  "model_answer": "Ideal model answer explaining the key concepts, syntax, and trade-offs clearly and concisely."
+}}

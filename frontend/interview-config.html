@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set Up Personalized Interview — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html" class="active">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-title">Interview Configuration & Personalization</div>
+      </header>
+
+      <main class="dashboard-content" style="max-width:860px; margin: 0 auto; width:100%;">
+        
+        <!-- Mode Switcher Tabs -->
+        <div class="config-tabs">
+          <button type="button" id="tab-btn-resume" class="config-tab active" onclick="switchConfigMode('resume')">
+            🎯 Resume + Job Description Personalization
+          </button>
+          <button type="button" id="tab-btn-standard" class="config-tab" onclick="switchConfigMode('standard')">
+            ⚙️ Standard Interview Setup
+          </button>
+        </div>
+
+        <!-- MODE 1: RESUME & JOB DESCRIPTION PERSONALIZATION -->
+        <div id="mode-resume-container">
+          <div class="card" style="margin-bottom: 24px;">
+            <h2 style="margin-bottom:8px;">Resume + Job Description Intelligence</h2>
+            <p class="text-muted" style="margin-bottom:24px;">
+              Upload your PDF Resume and paste the target Job Description. Our GenAI engine will extract skill gaps, evaluate match percentage, and craft a tailored mock interview specifically for this job role.
+            </p>
+
+            <form id="resume-analysis-form">
+              <div id="resume-form-error" class="text-danger" style="margin-bottom:16px; font-weight:600;"></div>
+
+              <div style="display:grid; grid-template-columns: 1fr; gap:20px; margin-bottom:20px;">
+                
+                <!-- Target Job Title -->
+                <div class="form-group">
+                  <label class="form-label" for="resume_job_title">Target Job Role / Title</label>
+                  <input type="text" id="resume_job_title" class="form-input" placeholder="e.g. Senior Java Backend Developer" required value="Java Developer">
+                </div>
+
+                <!-- PDF File Upload Zone -->
+                <div class="form-group">
+                  <label class="form-label">Upload Candidate Resume (PDF)</label>
+                  <div class="pdf-dropzone" id="pdf-dropzone" onclick="document.getElementById('resume_file_input').click()">
+                    <div class="pdf-dropzone-icon">📄</div>
+                    <div style="font-weight:600; color:var(--text-dark);" id="pdf-file-name">
+                      Click to choose or drag & drop your PDF Resume
+                    </div>
+                    <div class="text-muted" style="font-size:0.8rem; margin-top:4px;">
+                      Supported format: .pdf (Max size: 5MB)
+                    </div>
+                    <input type="file" id="resume_file_input" accept=".pdf" style="display:none;" required>
+                  </div>
+                </div>
+
+                <!-- Job Description Textarea -->
+                <div class="form-group">
+                  <label class="form-label" for="job_description_input">Job Description (JD)</label>
+                  <textarea id="job_description_input" class="form-input" rows="6" placeholder="Paste key responsibilities, requirements, and tech stack from the Job Description here..." required style="resize:vertical; line-height:1.5;"></textarea>
+                </div>
+              </div>
+
+              <button type="submit" id="btn-analyze-resume" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.05rem;">
+                🔍 Analyze Skill Match & Prepare Interview →
+              </button>
+            </form>
+          </div>
+
+          <!-- SKILL MATCH REPORT CARD (Dynamically Populated) -->
+          <div id="skill-match-report" class="card" style="display:none; border-top: 4px solid var(--primary);">
+            <div class="match-score-card">
+              <div>
+                <div style="font-size:1.1rem; font-weight:700; color:#FFFFFF;">Candidate Job Skill Alignment</div>
+                <div class="match-score-label">GenAI Match Intelligence</div>
+                <p id="match-summary-text" style="color:#94A3B8; font-size:0.88rem; margin-top:10px; max-width:540px;"></p>
+              </div>
+              <div style="text-align:center;">
+                <div id="match-pct-value" class="match-score-number">0%</div>
+                <div class="match-score-label" style="color:#38BDF8;">Overall Match</div>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:24px;">
+              <!-- Matched Skills -->
+              <div style="background-color:#F8FAFC; padding:16px; border-radius:var(--radius-md); border:1px solid #E2E8F0;">
+                <div style="font-size:0.85rem; font-weight:700; color:#15803D; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                  ✅ Matched Skills
+                </div>
+                <div id="pill-matched-container" class="skill-pill-group"></div>
+              </div>
+
+              <!-- Missing Skills -->
+              <div style="background-color:#F8FAFC; padding:16px; border-radius:var(--radius-md); border:1px solid #E2E8F0;">
+                <div style="font-size:0.85rem; font-weight:700; color:#B45309; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                  ⚠️ Missing / Gap Skills
+                </div>
+                <div id="pill-missing-container" class="skill-pill-group"></div>
+              </div>
+
+              <!-- Priority Interview Skills -->
+              <div style="background-color:#F8FAFC; padding:16px; border-radius:var(--radius-md); border:1px solid #E2E8F0;">
+                <div style="font-size:0.85rem; font-weight:700; color:#6B21A8; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                  🎯 Priority Interview Focus
+                </div>
+                <div id="pill-priority-container" class="skill-pill-group"></div>
+              </div>
+            </div>
+
+            <!-- START PERSONALIZED INTERVIEW FORM -->
+            <form id="start-personalized-form">
+              <input type="hidden" id="active_analysis_id" value="">
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:20px;">
+                <div class="form-group">
+                  <label class="form-label" for="p_interview_type">Interview Type</label>
+                  <select id="p_interview_type" class="form-select">
+                    <option value="Technical" selected>Technical Interview</option>
+                    <option value="HR">HR / Behavioral</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="p_difficulty">Initial Difficulty</label>
+                  <select id="p_difficulty" class="form-select">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="p_num_questions">Questions Count</label>
+                  <select id="p_num_questions" class="form-select">
+                    <option value="5" selected>5 Questions</option>
+                    <option value="10">10 Questions</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" id="btn-start-personalized" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.05rem; background-color:#16A34A; border-color:#16A34A;">
+                🚀 Start Personalized AI Interview →
+              </button>
+            </form>
+          </div>
+        </div>
+
+
+        <!-- MODE 2: STANDARD PRESET INTERVIEW SETUP -->
+        <div id="mode-standard-container" style="display:none;">
+          <div class="card">
+            <h2 style="margin-bottom:8px;">Set Up Standard Interview</h2>
+            <p class="text-muted" style="margin-bottom:32px;">Configure parameters for a preset GenAI mock interview session.</p>
+
+            <form id="interview-config-form">
+              <div id="config-error" class="text-danger" style="margin-bottom:16px; font-weight:600;"></div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="form-group">
+                  <label class="form-label" for="interview_type">Interview Type</label>
+                  <select id="interview_type" class="form-select" required>
+                    <option value="Technical">Technical Interview</option>
+                    <option value="HR">HR / Behavioral Interview</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="target_role">Target Job Role</label>
+                  <select id="target_role" class="form-select" required>
+                    <option value="Java Developer">Java Developer</option>
+                    <option value="Python Developer">Python Developer</option>
+                    <option value="Software Developer">Software Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Full Stack Developer">Full Stack Developer</option>
+                    <option value="Data Scientist">Data Scientist</option>
+                    <option value="DevOps Engineer">DevOps Engineer</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="experience_level">Experience Level</label>
+                  <select id="experience_level" class="form-select" required>
+                    <option value="Beginner">Beginner (Entry Level / Fresh Grad)</option>
+                    <option value="Intermediate" selected>Intermediate (1-4 Years)</option>
+                    <option value="Advanced">Advanced (Senior / Lead)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="topic">Topic / Primary Skill</label>
+                  <select id="topic" class="form-select" required>
+                    <option value="Java">Java</option>
+                    <option value="Python">Python</option>
+                    <option value="OOP">OOP (Object-Oriented Programming)</option>
+                    <option value="DSA">Data Structures & Algorithms</option>
+                    <option value="DBMS">DBMS / SQL</option>
+                    <option value="Operating Systems">Operating Systems</option>
+                    <option value="Computer Networks">Computer Networks</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Cloud">Cloud Architecture</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="difficulty">Difficulty Level</label>
+                  <select id="difficulty" class="form-select" required>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="num_questions">Number of Questions</label>
+                  <select id="num_questions" class="form-select" required>
+                    <option value="5" selected>5 Questions</option>
+                    <option value="10">10 Questions</option>
+                    <option value="15">15 Questions</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.05rem; margin-top:16px;">
+                Start Standard Interview →
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/interview-config.js"></script>
+</body>
+</html>

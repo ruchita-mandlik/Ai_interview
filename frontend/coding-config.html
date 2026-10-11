@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Coding Assessment Setup — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/interview.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <a href="dashboard.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon">⚡</div>
+          <span>InterviewAI</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+        <a href="interview-config.html" class="nav-item">💬 Practice Mock Interview</a>
+        <a href="coding-config.html" class="nav-item active">💻 AI Coding Interview</a>
+        <a href="history.html" class="nav-item">📜 Interview History</a>
+        <a href="performance.html" class="nav-item">📈 Performance & Skills</a>
+        <a href="profile.html" class="nav-item">👤 Profile & Target Role</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-outline full-width">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1 class="page-title">AI Coding Assessment Setup</h1>
+        <div class="user-pill">
+          <span class="user-avatar" id="user-avatar">U</span>
+          <span id="nav-user-name">Candidate</span>
+        </div>
+      </header>
+
+      <div class="content-body" style="max-width: 800px; margin: 0 auto;">
+        <div class="card" style="padding: 36px; background: #FFFFFF; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+          <div style="margin-bottom: 28px;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Configure Coding Interview Session</h2>
+            <p style="color: var(--text-muted);">Practice LeetCode & HackerRank style coding problems generated live by Cloud GenAI tailored to your role and target stack.</p>
+          </div>
+
+          <form id="coding-config-form" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="target_role">Target Job Role</label>
+              <input type="text" id="target_role" class="form-input" placeholder="e.g. Full Stack Developer, Python Engineer" required value="Software Engineer">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="topic">Technical Skill / Focus Area</label>
+              <select id="topic" class="form-select" required>
+                <option value="Data Structures & Algorithms" selected>Data Structures & Algorithms (Arrays, Hash Maps, Strings, Trees)</option>
+                <option value="Backend System Logic">Backend System & API Logic</option>
+                <option value="Dynamic Programming">Dynamic Programming & Optimization</option>
+                <option value="System & Database Algorithms">System & Database Algorithms</option>
+              </select>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label" for="experience_level">Experience Level</label>
+                <select id="experience_level" class="form-select" required>
+                  <option value="Beginner">Entry Level / Junior</option>
+                  <option value="Intermediate" selected>Mid Level (Intermediate)</option>
+                  <option value="Advanced">Senior / Principal Engineer</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="difficulty">Problem Difficulty</label>
+                <select id="difficulty" class="form-select" required>
+                  <option value="Easy">Easy (Foundational)</option>
+                  <option value="Medium" selected>Medium (Standard Tech Round)</option>
+                  <option value="Hard">Hard (FAANG Level)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="language">Programming Language</label>
+              <select id="language" class="form-select" required>
+                <option value="python" selected>Python 3</option>
+                <option value="javascript">JavaScript (Node.js)</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+              </select>
+            </div>
+
+            <button type="submit" id="start-btn" class="btn btn-primary btn-lg" style="margin-top: 10px; width: 100%;">
+              🚀 Start AI Coding Interview
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/coding-config.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+You are an expert technical interviewer and hiring manager at a top tech company.
+
+Generate {num_questions} realistic, practical interview questions for a candidate with the following details:
+- Target Job Role: {target_role}
+- Experience Level: {experience_level}
+- Topic / Skill Area: {topic}
+- Interview Type: {interview_type}
+- Difficulty Level: {difficulty}
+
+Instructions:
+1. Provide practical, scenario-based or conceptual technical questions suitable for this role and experience level.
+2. Return ONLY a valid JSON array of objects. Do not include markdown code blocks or additional conversational text outside the JSON.
+3. Each question object MUST follow this exact schema:
+[
+  {{
+    "question": "Clear question text here?",
+    "category": "{topic}",
+    "skill": "{topic}",
+    "difficulty": "{difficulty}",
+    "additional_instruction": "Optional helpful tip or guidance on what to cover in answer"
+  }}
+]
+
+Ensure all questions are distinct, engaging, and directly assess core competencies for {target_role}.

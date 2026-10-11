@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Coding Assessment Results — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/interview.css">
+  <link rel="stylesheet" href="css/coding-interview.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="result-container">
+    <!-- Result Header Card -->
+    <div class="result-header-card" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+      <div class="tag" style="background: rgba(56, 189, 248, 0.2); color: #38BDF8; margin-bottom: 12px; display: inline-block; padding: 4px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+        AI CODING ASSESSMENT EVALUATION REPORT
+      </div>
+      <h1 id="coding-title" style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Software Engineer Coding Assessment</h1>
+      <p id="coding-subtitle" style="color: #94A3B8;">Detailed execution breakdown, complexity metrics, and GenAI code review.</p>
+
+      <div class="score-circle" id="overall-score-circle" style="border-color: #38BDF8; color: #38BDF8;">
+        0%
+      </div>
+      <div style="margin-top: 10px; font-weight: 600; color: #CBD5E1;">Overall Coding Performance Score</div>
+    </div>
+
+    <!-- 4 Metric Cards Grid -->
+    <div class="coding-results-grid">
+      <div class="coding-metric-card">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">✅ Test Cases Passed</div>
+        <div class="coding-metric-val" id="test-cases-val" style="color: var(--success);">0/0</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);" id="pass-rate-text">100% Pass Rate</div>
+      </div>
+
+      <div class="coding-metric-card">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">⏱ Time Complexity</div>
+        <div class="coding-metric-val" id="time-comp-val" style="color: var(--primary);">O(N)</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Algorithmic Efficiency</div>
+      </div>
+
+      <div class="coding-metric-card">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">💾 Space Complexity</div>
+        <div class="coding-metric-val" id="space-comp-val" style="color: var(--primary);">O(1)</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Auxiliary Memory Usage</div>
+      </div>
+
+      <div class="coding-metric-card">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">📊 Correctness & Quality</div>
+        <div class="coding-metric-val" id="quality-score-val" style="color: #8B5CF6;">85%</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Readability & Edge Cases</div>
+      </div>
+    </div>
+
+    <!-- Grid: Detected Mistakes & Optimization Suggestions -->
+    <div class="result-grid">
+      <div class="question-card">
+        <h3 style="color: #DC2626; display: flex; align-items: center; gap: 8px;">
+          ⚠️ Detected Mistakes & Edge Case Gaps
+        </h3>
+        <ul class="improvements-list" id="detected-mistakes-list">
+          <!-- Rendered Mistakes -->
+        </ul>
+      </div>
+
+      <div class="question-card">
+        <h3 style="color: #2563EB; display: flex; align-items: center; gap: 8px;">
+          💡 Optimization Suggestions
+        </h3>
+        <ul class="strengths-list" id="optimization-list">
+          <!-- Rendered Suggestions -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- AI Code Review -->
+    <div class="question-card">
+      <h3 style="color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+        🧠 AI Code Review & Feedback Narrative
+      </h3>
+      <div id="ai-code-review-text" style="line-height: 1.6; color: var(--text-main); white-space: pre-line;">
+        Generating code review narrative...
+      </div>
+    </div>
+
+    <!-- Model Answer Code -->
+    <div class="question-card">
+      <h3 style="color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+        💻 Optimal Model Solution & Complexity Benchmark
+      </h3>
+      <pre id="model-solution-code" style="background-color: #0F172A; color: #38BDF8; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 0.9rem; overflow-x: auto; margin: 0;"></pre>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 20px;">
+      <a href="dashboard.html" class="btn btn-outline btn-lg">📊 Go to Dashboard</a>
+      <a href="coding-config.html" class="btn btn-primary btn-lg">💻 Practice Another Coding Problem</a>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/coding-result.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Results — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interview.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="interview-header">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>InterviewAI</span>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+      <a href="interview-config.html" class="btn btn-primary">Try Another Interview</a>
+    </div>
+  </header>
+
+  <div class="result-container">
+    <!-- Header Score Card -->
+    <div class="result-header-card">
+      <span class="badge badge-success" style="font-size:0.85rem; padding:6px 16px;">Completed</span>
+      <h1 style="color:#FFFFFF; margin-top:12px;" id="result-title">Interview Completed!</h1>
+      <p style="color:#DBEAFE;">Here is your overall weighted performance breakdown and actionable AI feedback.</p>
+
+      <div class="score-circle" id="overall-score-val">0%</div>
+    </div>
+
+    <!-- Rubric Dimension Breakdown Card -->
+    <div class="card">
+      <h3 style="margin-bottom:20px;">EVALUATION RUBRIC BREAKDOWN</h3>
+      
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem; margin-bottom:6px;">
+            <span>Technical Correctness (35% weight)</span>
+            <span id="val-tc">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div id="bar-tc" class="progress-bar-fill" style="width:0%;"></div></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem; margin-bottom:6px;">
+            <span>Conceptual Completeness (25% weight)</span>
+            <span id="val-cc">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div id="bar-cc" class="progress-bar-fill" style="width:0%;"></div></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem; margin-bottom:6px;">
+            <span>Response Relevance (15% weight)</span>
+            <span id="val-rr">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div id="bar-rr" class="progress-bar-fill" style="width:0%;"></div></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem; margin-bottom:6px;">
+            <span>Structural Clarity (15% weight)</span>
+            <span id="val-sc">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div id="bar-sc" class="progress-bar-fill" style="width:0%;"></div></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem; margin-bottom:6px;">
+            <span>Depth of Understanding (10% weight)</span>
+            <span id="val-du">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div id="bar-du" class="progress-bar-fill" style="width:0%;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid for Strengths & Areas for Improvement -->
+    <div class="result-grid">
+      <div class="card">
+        <h3 style="color:#065F46; margin-bottom:16px;">Key Strengths</h3>
+        <ul class="strengths-list" id="strengths-list">
+          <!-- Dynamically populated -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#92400E; margin-bottom:16px;">Areas for Improvement</h3>
+        <ul class="improvements-list" id="improvements-list">
+          <!-- Dynamically populated -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- AI Feedback Commentary -->
+    <div class="card">
+      <h3 style="margin-bottom:12px;">AI Comprehensive Feedback</h3>
+      <p id="feedback-text" style="font-size:1rem; color:var(--text-main); line-height:1.6;"></p>
+    </div>
+
+    <!-- Model Answers Breakdown -->
+    <div class="card">
+      <h3 style="margin-bottom:16px;">Question & Model Answer Breakdown</h3>
+      <div id="model-answers-container">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:40px;">
+      <a href="interview-config.html" class="btn btn-primary" style="padding:14px 28px;">Try Another Interview</a>
+      <a href="performance.html" class="btn btn-secondary" style="padding:14px 28px;">View Performance</a>
+      <a href="dashboard.html" class="btn btn-secondary" style="padding:14px 28px;">Back to Dashboard</a>
+    </div>
+
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/result.js"></script>
+</body>
+</html>

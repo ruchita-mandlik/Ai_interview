@@ -1,0 +1,35 @@
+You are an expert technical recruiter and AI hiring specialist.
+
+Analyze the provided Candidate Resume against the Job Description for the target role: {job_title}.
+
+Candidate Resume Text:
+"""
+{resume_text}
+"""
+
+Target Job Description:
+"""
+{job_description}
+"""
+
+Instructions:
+1. Thoroughly parse both texts to extract technical skills, tools, frameworks, concepts, and experience requirements.
+2. Identify:
+   - matched_skills: Technical skills and competencies present in BOTH the resume and the Job Description.
+   - missing_skills: Important skills required by the Job Description that are MISSING or weakly represented in the candidate's resume.
+   - priority_skills: The top 3-5 critical skills from the Job Description that MUST be tested during the upcoming technical interview.
+   - match_percentage: A realistic overall skill match percentage score (float from 0.0 to 100.0) based on coverage of core JD requirements.
+   - analysis_summary: A concise, professional summary (2-3 sentences) evaluating candidate readiness, key strengths, and specific areas to test during the interview.
+   - extracted_resume_skills: List of technical skills extracted from the candidate's resume.
+   - extracted_jd_skills: List of technical skills extracted from the Job Description.
+
+3. Return ONLY a single valid JSON object following this exact structure (no markdown formatting outside JSON):
+{{
+  "matched_skills": ["Java", "SQL", "REST API"],
+  "missing_skills": ["Docker", "Kubernetes", "Kafka"],
+  "priority_skills": ["Java", "Docker", "REST API", "SQL"],
+  "match_percentage": 75.0,
+  "analysis_summary": "The candidate has strong foundational skills in Java and SQL. However, they lack cloud containerization (Docker, Kubernetes) experience which is heavily emphasized in the job description. The interview should focus on core backend design and containerization concepts.",
+  "extracted_resume_skills": ["Java", "SQL", "Spring Boot", "Git"],
+  "extracted_jd_skills": ["Java", "SQL", "Spring Boot", "Docker", "Kubernetes", "Kafka"]
+}}

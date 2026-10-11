@@ -1,0 +1,6 @@
+Generate a comprehensive overall interview performance feedback report for candidate:
+Target Role: {target_role}
+Average Score: {overall_score}%
+Topics Covered: {topics}
+
+Provide constructive suggestions, top key strengths, areas to review, and recommended next steps for candidate career readiness.

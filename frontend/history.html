@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview History — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html" class="active">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-title">Interview History</div>
+        <a href="interview-config.html" class="btn btn-primary" style="padding:8px 16px; font-size:0.85rem;">+ New Interview</a>
+      </header>
+
+      <main class="dashboard-content">
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Target Role & Topic</th>
+                <th>Type</th>
+                <th>Difficulty</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-list-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/history.js"></script>
+</body>
+</html>

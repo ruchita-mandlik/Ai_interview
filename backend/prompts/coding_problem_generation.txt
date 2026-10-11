@@ -1,0 +1,37 @@
+You are a Senior Technical Software Engineer and Coding Interviewer creating a production-grade LeetCode/HackerRank style coding problem.
+
+TARGET ROLE: {target_role}
+EXPERIENCE LEVEL: {experience_level}
+TOPIC/SKILLS: {topic}
+DIFFICULTY: {difficulty}
+PROGRAMMING LANGUAGE: {language}
+
+INSTRUCTIONS:
+Generate 1 unique, highly relevant coding problem with problem description, starter code signature in {language}, input/output format, constraints, 2 sample test cases, and 2 hidden test cases.
+
+Return ONLY a valid JSON object with the following exact keys:
+{{
+  "title": "Problem Title",
+  "description": "Comprehensive markdown problem description explaining scenario, requirement, and clear examples.",
+  "input_format": "Description of input arguments or format",
+  "output_format": "Description of expected return value or output format",
+  "constraints": "1 <= N <= 10^5, -10^9 <= arr[i] <= 10^9",
+  "starter_code": "Language-specific starter function template with docstring / comment placeholder for candidate solution",
+  "sample_test_cases": [
+    {{
+      "input": "[2, 7, 11, 15]\\n9",
+      "expected_output": "[0, 1]",
+      "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+    }}
+  ],
+  "hidden_test_cases": [
+    {{
+      "input": "[3, 2, 4]\\n6",
+      "expected_output": "[1, 2]"
+    }}
+  ],
+  "skill": "{topic}",
+  "difficulty": "{difficulty}"
+}}
+
+Do NOT include any markdown code fence wrappers or extra commentary outside the JSON object.

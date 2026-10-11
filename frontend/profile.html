@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidate Profile — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html" class="active">👤 <span>Profile</span></a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-title">Candidate Profile</div>
+      </header>
+
+      <main class="dashboard-content" style="max-width:800px; margin: 0 auto; width:100%;">
+        <div class="card">
+          <h2 style="margin-bottom:8px;">Candidate Profile</h2>
+          <p class="text-muted" style="margin-bottom:32px;">Update your background, skills, and target job preferences to personalize your AI interviews.</p>
+
+          <form id="profile-form">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div class="form-group">
+                <label class="form-label" for="full_name">Full Name</label>
+                <input type="text" id="full_name" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" required readonly style="background-color:#F1F5F9;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="education">Education</label>
+                <input type="text" id="education" class="form-input" placeholder="e.g. B.Tech Computer Science">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="target_role">Target Job Role</label>
+                <input type="text" id="target_role" class="form-input" placeholder="e.g. Java Developer">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="experience_level">Experience Level</label>
+                <select id="experience_level" class="form-select">
+                  <option value="Beginner">Beginner (Entry Level / Fresh Grad)</option>
+                  <option value="Intermediate">Intermediate (1-4 Years)</option>
+                  <option value="Advanced">Advanced (Senior / Lead)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="years_of_experience">Years of Experience</label>
+                <input type="number" id="years_of_experience" class="form-input" min="0" max="40">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="preferred_interview_type">Preferred Interview Type</label>
+                <select id="preferred_interview_type" class="form-select">
+                  <option value="Technical">Technical Interview</option>
+                  <option value="HR">HR / Behavioral Interview</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="technical_interests">Technical Interests</label>
+                <input type="text" id="technical_interests" class="form-input" placeholder="e.g. Backend, Distributed Systems">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label" for="skills">Skills & Technical Competencies</label>
+              <textarea id="skills" class="form-textarea" style="min-height:90px;" placeholder="e.g. Java, OOP, DSA, SQL, Spring Boot, Microservices"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="padding:12px 32px; font-size:1rem;">
+              Save Changes
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

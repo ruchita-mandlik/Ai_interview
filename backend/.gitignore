@@ -1,0 +1,28 @@
+# Python virtual environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Environment variables and API keys
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Node dependencies and build files
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Debug files
+extracted_resume_debug.txt
+
+# IDE files
+.vscode/
+.idea/
+.DS_Store

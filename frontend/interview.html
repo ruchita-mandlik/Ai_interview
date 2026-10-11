@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Interview — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interview.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="interview-header">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>InterviewAI</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:16px;">
+      <span id="header-role-tag" class="text-muted" style="font-weight:600; font-size:0.9rem;">Technical Interview</span>
+      <div class="user-avatar" style="width:36px; height:36px;">👤</div>
+    </div>
+  </header>
+
+  <!-- Interview Body Container -->
+  <div class="interview-container">
+
+    <!-- Title & Metadata -->
+    <div>
+      <h1 id="interview-title">Technical Mock Interview</h1>
+      <p class="text-muted">Answer the questions to complete your interview</p>
+    </div>
+
+    <!-- Progress & Timer Meta Bar -->
+    <div class="interview-meta">
+      <div style="flex:1; margin-right:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span id="question-progress-text" style="font-size:0.8rem; font-weight:700; color:var(--primary);">QUESTION 1 OF 5</span>
+          <span id="difficulty-badge" class="badge badge-warning">Medium</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="question-progress-fill" class="progress-bar-fill" style="width: 20%;"></div>
+        </div>
+      </div>
+
+      <div class="timer-badge">
+        <span>⏱️</span>
+        <span id="timer-display">20:00</span>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="question-card">
+      <div class="interviewer-tag">
+        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        <span>AI Interviewer</span>
+      </div>
+
+      <div class="question-text" id="question-text">
+        Loading AI interview question...
+      </div>
+
+      <div class="question-hint" id="question-hint" style="display:none;"></div>
+    </div>
+
+    <!-- Answer Textarea Card -->
+    <div class="answer-card">
+      <label class="form-label" for="answer-textarea" style="font-size:1.05rem;">Your Answer</label>
+      <textarea id="answer-textarea" class="form-textarea" placeholder="Type your answer here... Explain concepts clearly with suitable code snippets or real-world examples." style="min-height:180px;"></textarea>
+
+      <div class="answer-toolbar">
+        <span class="word-count" id="word-count-display">0 words</span>
+        <div style="display:flex; gap:12px;">
+          <button type="button" id="clear-btn" class="btn btn-secondary">Clear Answer</button>
+          <button type="button" id="submit-answer-btn" class="btn btn-primary">Submit Answer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Step Navigation -->
+    <div class="interview-nav-footer">
+      <button type="button" id="prev-btn" class="btn btn-secondary">← Previous</button>
+      <span id="footer-page-counter" style="font-weight:600; color:var(--text-muted);">1 / 5</span>
+      <button type="button" id="next-btn" class="btn btn-secondary">Next →</button>
+    </div>
+
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/interview.js"></script>
+</body>
+</html>

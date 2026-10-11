@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <div class="auth-wrapper">
+    <!-- Left Sidebar Branding -->
+    <div class="auth-sidebar">
+      <div class="auth-sidebar-logo">
+        <svg viewBox="0 0 24 24" style="width:32px; height:32px; fill:#FFFFFF;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>InterviewAI</span>
+      </div>
+
+      <div class="auth-sidebar-content">
+        <h1>Welcome Back!</h1>
+        <p>Log in to continue your mock interview preparation and track your score progress.</p>
+
+        <div class="auth-sidebar-card">
+          <h4>Actionable AI Feedback</h4>
+          <p>Detailed evaluation rubric across 5 core dimensions for every response.</p>
+        </div>
+      </div>
+
+      <div class="auth-sidebar-footer">
+        Prepare smarter. Interview better.
+      </div>
+    </div>
+
+    <!-- Right Form Container -->
+    <div class="auth-form-container">
+      <div class="auth-form-box">
+        <div class="auth-header">
+          <h2>Log in to your account</h2>
+          <p>Enter your credentials to access your dashboard</p>
+        </div>
+
+        <form id="login-form">
+          <div id="auth-error" class="text-danger" style="margin-bottom:16px; font-size:0.9rem; font-weight:600;"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" placeholder="ruchita@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="form-label" for="password" style="margin-bottom:0;">Password</label>
+              <a href="#" onclick="showToast('Password reset link has been sent to your email.', 'info'); return false;" style="font-size:0.8rem;">Forgot password?</a>
+            </div>
+            <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1rem; margin-top:8px;">
+            Log In
+          </button>
+
+          <div class="auth-footer-link">
+            Don't have an account? <a href="register.html">Create account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

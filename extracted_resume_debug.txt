@@ -1,0 +1,64 @@
+=== RESUME TEXT ===
+Ruchita Mandlik
++91 9987591539|mandlikruchita6@gmail.com |linkedin.com/in/ ruchita-mandlik |github.com/ruchita-mandlik
+Education
+Shah & Anchor Kutchhi Engineering College (SAKEC)Aug. 2024 – May 2028
+Bachelor of Engineering in Computer Engineering Mumbai, Maharashtra
+CGP A: 9.38/10
+K. J. Somaiya College of Science & CommerceJun. 2022 – May 2024
+Higher Secondary Certificate (HSC) – Science (Computer Science) Mumbai, Maharashtra
+Technical Skills
+Languages: Java, Kotlin, Python, C, SQL
+Android Development: Android Studio, XML, RecyclerView, ViewBinding, SQLite, SharedPreferences, Material
+Design
+W eb T echnologies: HTML, CSS, JavaScript
+W eb T echnologies: Arduino UNO, ESP32, ThingSpeak, Sensors
+Database: SQLite, MySQL
+T ools: Git, GitHub, VS Code
+Core Subjects: Data Structures, DBMS, Operating Systems, Object-Oriented Programming
+Projects
+Secure Online V oting System|Java, JSP, Servlets, JDBC, MySQL2026
+• Developed a secure online voting application with role-based access for Voters and Admins.
+• Implemented secure authentication using BCrypt password hashing and session-based authorization.
+• Enforced one user–one vote using database constraints and immutable vote records.
+• Designed a normalized MySQL database schema for users, elections, candidates, votes, and audit logs.
+• Prevented SQL injection using Prepared Statements and implemented account lockout after repeated failed login
+attempts.
+• Built an admin dashboard for election management, vote statistics, and suspicious activity monitoring.
+LifeLink Blood Donar Connect Application|Kotlin, Android Studio, XML, SQLite2026
+• Developed an Android application for donor registration and emergency blood requests using Kotlin and SQLite.
+• Implemented authentication, donor search, and request management with RecyclerView and ViewBinding.
+• Designed a responsive Material Design interface with input validation.
+Customer Churn Prediction|Python, Scikit-learn, Pandas, NumPy, Matplotlib2026
+• Built a machine learning model to predict customer churn using Python and Scikit-learn.
+• Performed data preprocessing, feature engineering, and exploratory data analysis.
+• Evaluated model performance and visualized insights using Matplotlib.
+W ater Quality Monitoring System|Arduino UNO, ESP32, ThingSpeak, IoT2025
+• Developed an IoT-based system to monitor water quality using pH, turbidity, and temperature sensors.
+• Collected real-time sensor data and transmitted it to the ThingSpeak cloud platform.
+• Enabled remote monitoring and visualization of water quality parameters.
+Certifications
+•Microsoft AI Careers for Women (Edunet Foundation & SAP)
+•Google for Developers AI-ML Virtual Internship (AICTE EduSkills)
+•Cisco Networking Academy: Introduction to Modern AI, Apply AI: Analyze Customer Reviews
+•Python Training - IIT Bombay Spoken Tutorial
+Achievements
+•Appointed as Documentation Co-Head, Computer Society of India (CSI), SAKEC..
+=== JOB DESCRIPTION ===
+**Java Developer — Fresher / Entry Level**
+
+**Responsibilities:**
+- Develop and maintain applications using Java.
+- Write clean, reusable, and maintainable code.
+- Work with object-oriented programming concepts and data structures.
+- Write SQL queries and interact with relational databases.
+- Debug applications and fix software defects.
+- Collaborate with team members using Git and GitHub.
+
+**Requirements:**
+- Knowledge of Core Java, OOP, Collections, and Exception Handling.
+- Understanding of Data Structures and Algorithms.
+- Basic knowledge of SQL and DBMS.
+- Familiarity with REST APIs and software development principles.
+- Problem-solving and communication skills.
+- Knowledge of Git, GitHub, and software development tools.

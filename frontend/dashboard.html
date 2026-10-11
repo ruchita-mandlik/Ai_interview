@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html" class="active">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+          <li><a href="#" onclick="API.removeToken(); window.location.href='login.html'; return false;">🚪 <span>Logout</span></a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="user-avatar-initial">U</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sidebar-user-name">Candidate Name</div>
+          <div class="user-info-role" id="sidebar-user-role">Software Developer</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-actions">
+          <button class="icon-btn" title="Notifications">🔔</button>
+          <a href="profile.html" class="user-avatar" style="width:36px; height:36px; text-decoration:none; font-size:0.9rem;">👤</a>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <main class="dashboard-content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <h1>Welcome back, <span id="welcome-user-name">Candidate</span>! 👋</h1>
+          <p>Ready to take the next step in your interview journey?</p>
+        </div>
+
+        <!-- Dynamic Statistics Cards -->
+        <div class="stats-grid">
+          <div class="card stat-card">
+            <div>
+              <div class="text-muted" style="font-size:0.85rem; font-weight:600;">INTERVIEWS PRACTICED</div>
+              <div class="stat-val" id="stat-practiced">0</div>
+            </div>
+            <div class="stat-icon">📝</div>
+          </div>
+
+          <div class="card stat-card">
+            <div>
+              <div class="text-muted" style="font-size:0.85rem; font-weight:600;">AVERAGE SCORE</div>
+              <div class="stat-val" id="stat-avg-score">0%</div>
+            </div>
+            <div class="stat-icon">🏆</div>
+          </div>
+
+          <div class="card stat-card">
+            <div>
+              <div class="text-muted" style="font-size:0.85rem; font-weight:600;">SKILLS IN PROGRESS</div>
+              <div class="stat-val" id="stat-skills">0</div>
+            </div>
+            <div class="stat-icon">⚡</div>
+          </div>
+        </div>
+
+        <!-- Start a Mock Interview Cards -->
+        <div>
+          <h3 style="margin-bottom:16px;">START A MOCK INTERVIEW</h3>
+          <div class="practice-grid">
+            <div class="card practice-card">
+              <div>
+                <span class="badge badge-primary" style="margin-bottom:12px;">Technical</span>
+                <h3 style="margin-bottom:8px;">Technical Interview</h3>
+                <p class="text-muted" style="font-size:0.95rem; margin-bottom:20px;">
+                  Practice role-specific technical questions on Java, Python, DSA, SQL, OOP & System Design.
+                </p>
+              </div>
+              <button onclick="startPractice('Technical')" class="btn btn-primary">
+                Start Practice →
+              </button>
+            </div>
+
+            <div class="card practice-card" style="border-top-color: var(--secondary);">
+              <div>
+                <span class="badge badge-success" style="margin-bottom:12px;">Behavioral</span>
+                <h3 style="margin-bottom:8px;">HR & Behavioral Interview</h3>
+                <p class="text-muted" style="font-size:0.95rem; margin-bottom:20px;">
+                  Improve confidence, situational judgment, communication, and STAR method responses.
+                </p>
+              </div>
+              <button onclick="startPractice('HR')" class="btn btn-primary" style="background-color:var(--secondary);">
+                Start Practice →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid for Activity and Skill Progress -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px;">
+          <!-- Recent Interview Activity -->
+          <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:20px 24px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem;">RECENT INTERVIEW ACTIVITY</h3>
+              <a href="history.html" style="font-size:0.85rem; font-weight:600;">View All →</a>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Interview</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Score</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recent-activity-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Skill Progress -->
+          <div class="card">
+            <h3 style="font-size:1.1rem; margin-bottom:20px;">SKILL PROGRESS</h3>
+            <div id="skill-progress-container">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
