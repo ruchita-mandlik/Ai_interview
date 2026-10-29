@@ -8,6 +8,8 @@ from backend.models import User, CodingInterview, CodingQuestion, CodingSubmissi
 from backend.schemas.coding_interview import (
     CodingInterviewCreateRequest,
     CodeRunRequest,
+    CustomRunRequest,
+    CustomRunResultSchema,
     CodingSubmissionRequest,
     CodeRunResultSchema,
     CodingInterviewResponse,
@@ -29,6 +31,16 @@ async def start_coding_interview(
     return build_coding_interview_response(interview)
 
 
+@router.get("/list", response_model=List[CodingInterviewResponse])
+def list_coding_interviews(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Returns all coding assessments created by the authenticated user."""
+    interviews = CodingService.list_coding_interviews(db, current_user.id)
+    return [build_coding_interview_response(i) for i in interviews]
+
+
 @router.get("/{interview_id}", response_model=CodingInterviewResponse)
 def get_coding_interview(
     interview_id: str,
@@ -39,13 +51,34 @@ def get_coding_interview(
     return build_coding_interview_response(interview)
 
 
+@router.post("/{interview_id}/next", response_model=CodingQuestionSchema)
+async def generate_next_coding_problem(
+    interview_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Generates the next DSA problem in the existing coding interview session."""
+    question = await CodingService.generate_next_problem(db, interview_id, current_user)
+    return build_coding_question_schema(question)
+
+
 @router.post("/run-tests", response_model=CodeRunResultSchema)
 def run_sample_tests(
     req: CodeRunRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Runs candidate code against sample test cases and optional custom input in isolated sandbox."""
     return CodingService.run_sample_tests(db, req, current_user)
+
+
+@router.post("/run-custom", response_model=CustomRunResultSchema)
+def run_custom_input(
+    req: CustomRunRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Executes arbitrary code against candidate-supplied custom input string."""
+    return CodingService.run_custom_input(req)
 
 
 @router.post("/submit", response_model=CodingSubmissionResultSchema)
@@ -54,6 +87,7 @@ async def submit_coding_solution(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Executes full test suite (sample + hidden) and evaluates solution using real test evidence plus GenAI."""
     submission = await CodingService.submit_coding_solution(db, req, current_user)
     return build_submission_schema(submission)
 
@@ -105,23 +139,32 @@ def build_submission_schema(sub: CodingSubmission) -> CodingSubmissionResultSche
     )
 
 
-def build_coding_interview_response(interview: CodingInterview) -> CodingInterviewResponse:
-    q_schemas = []
-    for q in interview.questions:
-        q_schemas.append(CodingQuestionSchema(
-            id=q.id,
-            question_number=q.question_number,
-            title=q.title,
-            description=q.description,
-            input_format=q.input_format,
-            output_format=q.output_format,
-            constraints=q.constraints,
-            starter_code=q.starter_code,
-            sample_test_cases=json.loads(q.sample_test_cases or "[]"),
-            skill=q.skill,
-            difficulty=q.difficulty
-        ))
+def build_coding_question_schema(q: CodingQuestion) -> CodingQuestionSchema:
+    hints_list = []
+    if getattr(q, "hints", None):
+        try:
+            hints_list = json.loads(q.hints)
+        except Exception:
+            hints_list = [q.hints]
 
+    return CodingQuestionSchema(
+        id=q.id,
+        question_number=q.question_number,
+        title=q.title,
+        description=q.description,
+        input_format=q.input_format,
+        output_format=q.output_format,
+        constraints=q.constraints,
+        starter_code=q.starter_code,
+        hints=hints_list if isinstance(hints_list, list) else [],
+        sample_test_cases=json.loads(q.sample_test_cases or "[]"),
+        skill=q.skill,
+        difficulty=q.difficulty
+    )
+
+
+def build_coding_interview_response(interview: CodingInterview) -> CodingInterviewResponse:
+    q_schemas = [build_coding_question_schema(q) for q in interview.questions]
     sub_schemas = [build_submission_schema(s) for s in interview.submissions]
 
     return CodingInterviewResponse(

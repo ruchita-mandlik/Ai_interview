@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Memory & Progress Intelligence — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/interview.css">
+  <!-- Chart.js for Interactive Dashboard Telemetry -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Interactive Dashboard & Analytics Styles */
+    .filter-bar {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-pill-btn {
+      border: 1px solid #CBD5E1;
+      background: #F8FAFC;
+      color: #475569;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill-btn:hover {
+      background: #EEF2F6;
+      border-color: #94A3B8;
+      color: #0F172A;
+    }
+    .filter-pill-btn.active {
+      background: #2563EB;
+      border-color: #2563EB;
+      color: #FFFFFF;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    }
+    .date-input {
+      padding: 5px 10px;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #1E293B;
+      background: #FFFFFF;
+      outline: none;
+    }
+    .date-input:focus {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .memory-stat-pill {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      padding: 8px 16px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .memory-stat-pill .val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+    .memory-stat-pill .lbl {
+      font-size: 0.72rem;
+      color: #E2E8F0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .metrics-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .metric-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .metric-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+    .metric-sub {
+      font-size: 0.78rem;
+      color: #64748B;
+      margin-top: 4px;
+    }
+
+    .analytics-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 992px) {
+      .analytics-section-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .chart-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-container-box {
+      position: relative;
+      width: 100%;
+      height: 290px;
+      margin-top: auto;
+    }
+
+    .delta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+    .delta-badge.positive {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+    .delta-badge.negative {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+    .delta-badge.neutral {
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #E2E8F0;
+    }
+
+    /* Inspection Modal / Drawer */
+    .evidence-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .evidence-modal {
+      background: #FFFFFF;
+      border-radius: 14px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid #E2E8F0;
+      padding: 24px;
+    }
+
+    .table-memory {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .table-memory th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #F8FAFC;
+      border-bottom: 2px solid #E2E8F0;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .table-memory td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #F1F5F9;
+      color: #1E293B;
+    }
+    .table-memory tr:hover td {
+      background: #F8FAFC;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+          <li><a href="#" onclick="API.removeToken(); window.location.href='login.html'; return false;">🚪 <span>Logout</span></a></li>
+        </ul>
+
+        <div class="sidebar-menu-label" style="margin-top:18px;">AI Studio & Intelligence</div>
+        <ul class="sidebar-nav">
+          <li><a id="nav-ai-studio-adaptive" href="adaptive-interview.html" style="color:#60A5FA; font-weight:600;">🧠 <span>Adaptive Interview</span></a></li>
+          <li><a id="nav-ai-studio-analysis" href="analysis.html" style="color:#818CF8; font-weight:600;">🔍 <span>Deep AI Analysis</span></a></li>
+          <li><a id="nav-ai-studio-roadmap" href="roadmap.html" style="color:#34D399; font-weight:600;">📅 <span>Preparation Roadmap</span></a></li>
+          <li><a id="nav-ai-studio-memory" href="memory.html" class="active" style="color:#F59E0B; font-weight:700;">💡 <span>Interview Memory</span></a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="sidebar-user-avatar">U</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sidebar-user-name">Candidate Name</div>
+          <div class="user-info-role" id="sidebar-user-role">Software Developer</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-title" style="display:flex; align-items:center; gap:8px;">
+          <span>💡</span> <span>Interview Memory & Progress Intelligence</span>
+        </div>
+        <div class="topbar-actions">
+          <button id="btn-refresh-memory" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="Refresh Memory Intelligence">
+            <span>🔄</span> <span>Sync Telemetry</span>
+          </button>
+          <a href="roadmap.html" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; text-decoration:none;">
+            📅 Roadmap
+          </a>
+          <a href="analysis.html" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; text-decoration:none;">
+            🔍 Deep Analysis
+          </a>
+          <a href="profile.html" class="user-avatar" style="width:36px; height:36px; text-decoration:none; font-size:0.9rem;">👤</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="dashboard-content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%); margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
+            <div style="max-width:650px;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <span class="badge" style="background:#FEF3C7; color:#92400E; font-weight:700;">Persistent Memory Active</span>
+                <span id="memory-target-role" style="color:#C7D2FE; font-weight:600; font-size:0.85rem;">Target Role: Software Engineer</span>
+              </div>
+              <h1 style="font-size:1.75rem; color:#FFFFFF; margin-bottom:6px; font-weight:800;">
+                Cross-Session Intelligence & Telemetry
+              </h1>
+              <p style="color:#E0E7FF; font-size:0.95rem; line-height:1.5;">
+                Real evaluated performance across interviews. Interactive analytics tracking your score trajectory, recurring weaknesses, verified skill improvements, and targeted remediation.
+              </p>
+            </div>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <div class="memory-stat-pill">
+                <span class="val" id="stat-sessions-count">0</span>
+                <span class="lbl">Evaluated Sessions</span>
+              </div>
+              <div class="memory-stat-pill">
+                <span class="val" id="stat-avg-score">0%</span>
+                <span class="lbl">Average Score</span>
+              </div>
+              <div class="memory-stat-pill">
+                <span class="val" id="stat-improved-count" style="color:#86EFAC;">0</span>
+                <span class="lbl">Improved Skills</span>
+              </div>
+              <div class="memory-stat-pill">
+                <span class="val" id="stat-weakness-count" style="color:#FCA5A5;">0</span>
+                <span class="lbl">Active Weaknesses</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Range Filter & Data Integrity Bar -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <span style="font-size:0.82rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Time Range:</span>
+            <button class="filter-pill-btn active" id="filter-pill-all" onclick="setTimeFilter('all')">All Time</button>
+            <button class="filter-pill-btn" id="filter-pill-30d" onclick="setTimeFilter('30d')">Last 30 Days</button>
+            <button class="filter-pill-btn" id="filter-pill-90d" onclick="setTimeFilter('90d')">Last 90 Days</button>
+          </div>
+
+          <div class="filter-group">
+            <label style="font-size:0.8rem; font-weight:600; color:#64748B;">From:</label>
+            <input type="date" id="filter-date-from" class="date-input">
+            <label style="font-size:0.8rem; font-weight:600; color:#64748B;">To:</label>
+            <input type="date" id="filter-date-to" class="date-input">
+            <button class="btn btn-primary" style="padding:5px 12px; font-size:0.8rem; font-weight:600;" onclick="applyCustomDateFilter()">Apply</button>
+            <button class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem;" onclick="resetDateFilter()">Reset</button>
+          </div>
+
+          <div id="exclusion-badge-container" style="display:none;">
+            <span id="exclusion-badge" class="badge" style="background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; font-size:0.75rem; font-weight:600;" title="Exclusion note">
+              ℹ️ Exclusions Active
+            </span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="memory-loading" class="card" style="text-align:center; padding:60px 20px;">
+          <div style="font-size:2.5rem; margin-bottom:12px;">⏳</div>
+          <h3 style="color:#1E293B; margin-bottom:6px;">Analyzing Cross-Session Memory & Charts...</h3>
+          <p class="text-muted" style="max-width:480px; margin:0 auto;">
+            Synthesizing longitudinal progress, persistent mistakes, and like-for-like session comparisons from your actual interview records.
+          </p>
+        </div>
+
+        <!-- Empty State (No completed interviews) -->
+        <div id="memory-empty" class="card" style="display:none; text-align:center; padding:60px 24px;">
+          <div style="font-size:3.5rem; margin-bottom:16px;">💡</div>
+          <h2 style="color:#0F172A; margin-bottom:8px; font-weight:800;">No Interview Memory History Yet</h2>
+          <p id="empty-state-message" class="text-muted" style="max-width:540px; margin:0 auto 24px; font-size:1rem; line-height:1.6;">
+            Complete your first mock interview or answer adaptive questions. The Intelligence Engine will remember your performance, detect recurring mistakes, and prove real skill improvement.
+          </p>
+          <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <a href="interview-config.html" class="btn btn-primary" style="padding:12px 28px; text-decoration:none; font-weight:700;">
+              🚀 Start Practice Interview →
+            </a>
+            <a href="dashboard.html" class="btn btn-secondary" style="padding:12px 24px; text-decoration:none;">
+              📊 Back to Dashboard
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Memory Dashboard Container -->
+        <div id="memory-content" style="display:none;">
+
+          <!-- SECTION: Summary Metrics Above Charts -->
+          <div class="metrics-summary-grid">
+            <div class="metric-card">
+              <div class="metric-label"><span>📊</span> <span>Evaluated Sessions</span></div>
+              <div class="metric-value" id="kpi-valid-sessions">0</div>
+              <div class="metric-sub" id="kpi-questions-count">0 questions evaluated</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label"><span>🎯</span> <span>Overall Average Score</span></div>
+              <div class="metric-value" id="kpi-avg-score" style="color:#2563EB;">0%</div>
+              <div class="metric-sub" id="kpi-score-range">High: --% | Low: --%</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label"><span>⭐</span> <span>Verified Improved Skills</span></div>
+              <div class="metric-value" id="kpi-improved-skills" style="color:#16A34A;">0</div>
+              <div class="metric-sub" id="kpi-improved-note">Supported by 2+ evaluations</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label"><span>🚨</span> <span>Recurring Weaknesses</span></div>
+              <div class="metric-value" id="kpi-weaknesses" style="color:#DC2626;">0</div>
+              <div class="metric-sub" id="kpi-weaknesses-note">Occurred across 2+ sessions</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label"><span>📈</span> <span>Score Trajectory</span></div>
+              <div class="metric-value" id="kpi-trajectory" style="font-size:1.35rem; color:#4338CA;">Stable</div>
+              <div class="metric-sub" id="kpi-overall-delta">Baseline established</div>
+            </div>
+          </div>
+
+          <!-- SECTION 1: Score Trajectory & Improvement Velocity -->
+          <div class="analytics-section-grid">
+            <!-- Chart 1: Score Trajectory Line Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>📈</span> <span>Chronological Score Trajectory</span>
+                </div>
+                <span class="badge" style="background:#EFF6FF; color:#1E40AF; font-size:0.75rem;">Click node to inspect</span>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Evolution of interview scores in chronological order. Tooltips reveal session topic, role, and score delta.
+              </p>
+              <div class="chart-container-box">
+                <canvas id="chart-score-trajectory"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Improvement Trend & Cumulative Velocity -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>🚀</span> <span>Improvement Trend & Moving Average</span>
+                </div>
+                <div id="improvement-status-pill" class="delta-badge neutral">Baseline</div>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Session scores benchmarked against your cumulative moving average, showing verified gains over baseline.
+              </p>
+              <div class="chart-container-box">
+                <canvas id="chart-improvement-trend"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Skill-wise Performance & Weakness Frequency -->
+          <div class="analytics-section-grid">
+            <!-- Chart 3: Skill-wise Performance Bar Chart (Baseline vs Latest) -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>🎯</span> <span>Skill-wise Performance (Baseline vs Latest)</span>
+                </div>
+                <span class="badge" style="background:#F0FDF4; color:#166534; font-size:0.75rem;">Evidence-based</span>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Comparing initial baseline scores against latest scores for each normalized technical skill.
+              </p>
+              <div class="chart-container-box">
+                <canvas id="chart-skill-performance"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 4: Weakness Frequency Horizontal Bar Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>⚠️</span> <span>Weakness Frequency Across Sessions</span>
+                </div>
+                <span class="badge" style="background:#FEF2F2; color:#991B1B; font-size:0.75rem;">Distinct Sessions Only</span>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Ranked by occurrences across distinct interview sessions (no multi-question inflation within one session).
+              </p>
+              <div class="chart-container-box">
+                <canvas id="chart-weakness-frequency"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Grouped Session Comparison & Score Distribution -->
+          <div class="analytics-section-grid">
+            <!-- Chart 5: Grouped Session Comparison (Rubric Dimensions & Skills) -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>⚖️</span> <span>Interactive Session Comparison</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <select id="select-session-a" class="date-input" style="font-weight:600;"></select>
+                  <span style="font-size:0.8rem; font-weight:700; color:#64748B;">vs</span>
+                  <select id="select-session-b" class="date-input" style="font-weight:600;"></select>
+                </div>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Side-by-side rubric dimension comparison (Technical Correctness, Conceptual Completeness, Relevance, Clarity, Depth).
+              </p>
+              <div class="chart-container-box" style="height:250px;">
+                <canvas id="chart-session-comparison"></canvas>
+              </div>
+
+              <!-- Quick Badges for Comparison: Repeated Mistakes & Resolved Weaknesses -->
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid #F1F5F9;">
+                <div>
+                  <span style="font-size:0.75rem; font-weight:700; color:#166534; display:block; margin-bottom:4px;">✅ Resolved Between Sessions:</span>
+                  <div id="comp-resolved-badges" style="font-size:0.8rem; color:#475569;">None</div>
+                </div>
+                <div>
+                  <span style="font-size:0.75rem; font-weight:700; color:#991B1B; display:block; margin-bottom:4px;">🚨 Repeated Mistakes:</span>
+                  <div id="comp-repeated-badges" style="font-size:0.8rem; color:#475569;">None</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart 6: Score Distribution Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span>📊</span> <span>Score Distribution Bins</span>
+                </div>
+                <span class="badge" style="background:#F8FAFC; color:#475569; font-size:0.75rem;">All Completed Sessions</span>
+              </div>
+              <p class="text-muted" style="font-size:0.8rem; margin:0 0 12px 0;">
+                Distribution of valid scores across performance bands. Preserves genuine 0% scores while excluding uncompleted tests.
+              </p>
+              <div class="chart-container-box">
+                <canvas id="chart-score-distribution"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: Next Best Action Card -->
+          <div id="next-action-card" class="next-action-box" style="background:linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border:1px solid #BFDBFE; border-radius:12px; padding:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+            <div style="max-width:720px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="font-size:1.1rem;">🎯</span>
+                <strong style="color:#1E40AF; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.04em;">Next Best Action Recommendation</strong>
+              </div>
+              <div id="next-action-text" style="color:#1E3A8A; font-size:1rem; font-weight:600; line-height:1.5;">
+                Synthesizing highest impact focus topic...
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a href="adaptive-interview.html" class="btn btn-primary" style="padding:10px 20px; font-weight:700; text-decoration:none;">
+                🧠 Adaptive Drill →
+              </a>
+              <a href="roadmap.html" class="btn btn-secondary" style="padding:10px 18px; font-weight:600; text-decoration:none; background:#FFFFFF;">
+                📅 View Tasks
+              </a>
+            </div>
+          </div>
+
+          <!-- SECTION 5: Evaluated Interview Sessions Archive Table -->
+          <div class="card" style="margin-bottom:24px; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h3 style="margin:0; font-size:1.15rem; font-weight:700; color:#0F172A;">Evaluated Interview Sessions Archive</h3>
+                <p class="text-muted" style="margin:4px 0 0 0; font-size:0.85rem;">
+                  Every validated interview session included in current analytics calculations.
+                </p>
+              </div>
+              <span id="archive-count-badge" class="badge" style="background:#F1F5F9; color:#475569; font-weight:700;">0 Valid Sessions</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="table-memory">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Target Role</th>
+                    <th>Topic & Difficulty</th>
+                    <th>Score</th>
+                    <th>Score Delta</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="session-archive-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Evidence Inspection Modal / Drawer -->
+  <div id="evidence-modal-backdrop" class="evidence-modal-backdrop" onclick="closeEvidenceModal(event)">
+    <div class="evidence-modal" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #E2E8F0; padding-bottom:12px;">
+        <h3 id="modal-title" style="margin:0; font-size:1.2rem; color:#0F172A; display:flex; align-items:center; gap:8px;">
+          Evidence Inspection
+        </h3>
+        <button onclick="closeEvidenceModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748B;">✕</button>
+      </div>
+      <div id="modal-body" style="font-size:0.9rem; color:#334155; line-height:1.6;">
+        <!-- Injected dynamically -->
+      </div>
+      <div id="modal-footer" style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #E2E8F0; padding-top:14px;">
+        <button class="btn btn-secondary" onclick="closeEvidenceModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/memory.js"></script>
+</body>
+</html>

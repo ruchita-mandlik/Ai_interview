@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Preparation Roadmap — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/interview.css">
+  <style>
+    /* Premium Roadmap Custom Styles */
+    .roadmap-task-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+    .roadmap-task-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .roadmap-task-card.task-completed {
+      background: #F8FAFC;
+      border-color: #E2E8F0;
+      opacity: 0.9;
+    }
+    .task-prio-critical {
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FEE2E2;
+    }
+    .task-prio-high {
+      background: #FFF7ED;
+      color: #EA580C;
+      border: 1px solid #FFEDD5;
+    }
+    .task-prio-medium {
+      background: #EFF6FF;
+      color: #2563EB;
+      border: 1px solid #DBEAFE;
+    }
+    .task-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #F1F5F9;
+      color: #475569;
+    }
+    .exercise-box {
+      background: #F8FAFC;
+      border-left: 3px solid #2563EB;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-top: 10px;
+    }
+    .evidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #FEF3C7;
+      color: #92400E;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid #FDE68A;
+      margin-top: 6px;
+    }
+    .status-tab-btn {
+      border: none;
+      background: transparent;
+      color: #64748B;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .status-tab-btn.active {
+      background: #FFFFFF;
+      color: #0F172A;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .phase-tab-btn {
+      transition: all 0.15s ease;
+    }
+    .details-toggle-btn {
+      background: none;
+      border: none;
+      color: #2563EB;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .details-toggle-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+          <li><a href="#" onclick="API.removeToken(); window.location.href='login.html'; return false;">🚪 <span>Logout</span></a></li>
+        </ul>
+
+        <div class="sidebar-menu-label" style="margin-top:18px;">AI Studio & Intelligence</div>
+        <ul class="sidebar-nav">
+          <li><a id="nav-ai-studio-adaptive" href="adaptive-interview.html" style="color:#60A5FA; font-weight:600;">🧠 <span>Adaptive Interview</span></a></li>
+          <li><a id="nav-ai-studio-analysis" href="analysis.html" style="color:#818CF8; font-weight:600;">🔍 <span>Deep AI Analysis</span></a></li>
+          <li><a id="nav-ai-studio-roadmap" href="roadmap.html" class="active" style="color:#34D399; font-weight:600;">📅 <span>Preparation Roadmap</span></a></li>
+          <li><a id="nav-ai-studio-memory" href="memory.html" style="color:#F59E0B; font-weight:600;">💡 <span>Interview Memory</span></a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="sidebar-user-avatar">U</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sidebar-user-name">Candidate Name</div>
+          <div class="user-info-role" id="sidebar-user-role">Software Developer</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-title">Personalized Preparation Roadmap</div>
+        <div class="topbar-actions">
+          <button id="btn-download-pdf" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; font-weight:700; margin-right:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="Download Roadmap Analysis as PDF">
+            <span>📥</span> <span>Download PDF</span>
+          </button>
+          <a id="topbar-analysis-link" href="analysis.html" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; text-decoration:none; margin-right:8px;">
+            🔍 View Deep Analysis
+          </a>
+          <button class="icon-btn" title="Notifications">🔔</button>
+          <a href="profile.html" class="user-avatar" style="width:36px; height:36px; text-decoration:none; font-size:0.9rem;">👤</a>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <main class="dashboard-content">
+        <!-- Header Banner -->
+        <div class="welcome-banner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+              <span class="badge badge-success" style="background:#D1FAE5; color:#065F46; font-weight:700;">4-Phase Preparation Plan</span>
+              <span id="roadmap-target-role-badge" style="font-size:0.85rem; color:#DBEAFE; font-weight:600;">Software Developer</span>
+            </div>
+            <h1 id="roadmap-title" style="font-size:1.6rem; margin-bottom:4px;">Personalized Preparation Roadmap</h1>
+            <p style="color:#DBEAFE; font-size:0.95rem;">
+              Evidence-based study milestones designed to remediate your identified interview gaps.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px;">
+              <label for="roadmap-session-select" style="font-size:0.75rem; color:#DBEAFE; display:block; margin-bottom:2px;">Select Session:</label>
+              <select id="roadmap-session-select" style="background:transparent; color:#FFFFFF; border:none; outline:none; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                <option value="" style="color:#000;">Loading sessions...</option>
+              </select>
+            </div>
+            <button id="btn-banner-download-pdf" class="btn btn-secondary" style="background:rgba(255,255,255,0.22); color:#FFF; border-color:rgba(255,255,255,0.4); font-weight:700; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="Download Roadmap Analysis as PDF">
+              <span>📥</span> <span>Download PDF</span>
+            </button>
+            <a id="btn-switch-analysis" href="analysis.html" class="btn btn-secondary" style="background:rgba(255,255,255,0.2); color:#FFF; border-color:rgba(255,255,255,0.35); text-decoration:none;">
+              🔍 Deep Analysis
+            </a>
+            <a href="interview-config.html" class="btn btn-primary" style="background:#2563EB; border-color:#3B82F6; text-decoration:none;">
+              🚀 Practice Mock →
+            </a>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="roadmap-loading" class="card" style="text-align:center; padding:50px 20px; display:block;">
+          <div style="font-size:2.5rem; margin-bottom:12px;">⏳</div>
+          <h3 style="color:#1E293B; margin-bottom:8px;">Synthesizing 4-Phase Roadmap...</h3>
+          <p class="text-muted" style="max-width:500px; margin:0 auto;">
+            Generating prioritized daily tasks and remediation exercises based on your actual interview results.
+          </p>
+        </div>
+
+        <!-- Empty / Error State -->
+        <div id="roadmap-empty" class="card" style="display:none; text-align:center; padding:60px 24px;">
+          <div style="font-size:3.5rem; margin-bottom:16px;">🗺️</div>
+          <h2 id="roadmap-empty-title" style="color:#0F172A; margin-bottom:8px; font-weight:800;">No Preparation Roadmap Found</h2>
+          <p id="roadmap-empty-msg" class="text-muted" style="max-width:540px; margin:0 auto 24px; font-size:1rem; line-height:1.6;">
+            Complete an adaptive mock interview or select an interview with completed questions to generate your personalized 4-phase preparation roadmap.
+          </p>
+          <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <a href="interview-config.html" class="btn btn-primary" style="padding:12px 28px; text-decoration:none; font-weight:700;">
+              🚀 Start Practice Interview →
+            </a>
+            <a href="analysis.html" class="btn btn-secondary" style="padding:12px 24px; text-decoration:none;">
+              🔍 Go to Deep Analysis
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="roadmap-content" style="display:none;">
+
+          <!-- Top Row: Progress Summary & Schedule Customizer -->
+          <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:24px; margin-bottom:24px;">
+            <!-- Roadmap Progress Card -->
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <span class="text-muted" style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">ROADMAP PROGRESS & READINESS</span>
+                  <span id="roadmap-readiness-badge" class="badge badge-success">Calibrated</span>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:10px;">
+                  <div id="roadmap-progress-pct" style="font-size:3rem; font-weight:900; color:#10B981; line-height:1;">0%</div>
+                  <div style="font-size:0.95rem; color:#475569; font-weight:600;">
+                    <span id="roadmap-tasks-completed-count">0</span> of <span id="roadmap-tasks-total-count">0</span> Tasks Completed
+                  </div>
+                </div>
+                <div class="progress-bar-bg" style="height:10px; margin-bottom:16px;">
+                  <div id="roadmap-progress-bar-fill" class="progress-bar-fill" style="width:0%; background-color:#10B981; transition:width 0.4s ease;"></div>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:12px 14px; text-align:center;">
+                <div>
+                  <div style="font-size:0.75rem; color:#64748B; font-weight:600; text-transform:uppercase;">Total Effort</div>
+                  <div id="roadmap-total-hours" style="font-size:1.1rem; font-weight:800; color:#0F172A; margin-top:2px;">0 hrs</div>
+                </div>
+                <div style="border-left:1px solid #E2E8F0; border-right:1px solid #E2E8F0;">
+                  <div style="font-size:0.75rem; color:#64748B; font-weight:600; text-transform:uppercase;">Remaining Effort</div>
+                  <div id="roadmap-remaining-hours" style="font-size:1.1rem; font-weight:800; color:#2563EB; margin-top:2px;">0 hrs</div>
+                </div>
+                <div>
+                  <div style="font-size:0.75rem; color:#64748B; font-weight:600; text-transform:uppercase;">Critical Left</div>
+                  <div id="roadmap-critical-count" style="font-size:1.1rem; font-weight:800; color:#DC2626; margin-top:2px;">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Schedule Customizer Card -->
+            <div class="card" style="border-top:4px solid var(--primary);">
+              <h3 style="font-size:1.05rem; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+                <span>⏱️</span> Schedule & Pacing Calibration
+              </h3>
+              <form id="schedule-form" onsubmit="event.preventDefault(); handleUpdatePreferences();">
+                <div style="margin-bottom:12px;">
+                  <label for="pref-target-date" style="display:block; font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:4px;">
+                    Target Interview Date:
+                  </label>
+                  <input type="date" id="pref-target-date" class="form-control" style="width:100%; padding:8px 12px; border:1px solid #CBD5E1; border-radius:6px; font-family:inherit;">
+                </div>
+                <div style="margin-bottom:14px;">
+                  <label for="pref-daily-hours" style="display:block; font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:4px;">
+                    Daily Study Commitment:
+                  </label>
+                  <select id="pref-daily-hours" class="form-control" style="width:100%; padding:8px 12px; border:1px solid #CBD5E1; border-radius:6px; font-family:inherit; background:#FFF;">
+                    <option value="1.0">1.0 Hour / day (Steady Pace)</option>
+                    <option value="1.5">1.5 Hours / day</option>
+                    <option value="2.0" selected>2.0 Hours / day (Recommended)</option>
+                    <option value="3.0">3.0 Hours / day (Intensive Prep)</option>
+                    <option value="4.0">4.0 Hours / day (Sprint Prep)</option>
+                  </select>
+                </div>
+                <button type="submit" id="btn-save-schedule" class="btn btn-primary" style="width:100%; padding:10px; font-size:0.9rem; font-weight:700;">
+                  💾 Recalibrate Schedule & Durations
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Filter Bars: Phase & Status -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <!-- Phase Filter Tabs -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap;" id="phase-filter-bar">
+              <button onclick="filterRoadmapPhase('all')" class="btn btn-primary phase-tab-btn active" id="tab-phase-all">
+                All Phases
+              </button>
+              <button onclick="filterRoadmapPhase(1)" class="btn btn-secondary phase-tab-btn" id="tab-phase-1">
+                Phase 1: Fundamentals
+              </button>
+              <button onclick="filterRoadmapPhase(2)" class="btn btn-secondary phase-tab-btn" id="tab-phase-2">
+                Phase 2: Architecture
+              </button>
+              <button onclick="filterRoadmapPhase(3)" class="btn btn-secondary phase-tab-btn" id="tab-phase-3">
+                Phase 3: Applied Coding
+              </button>
+              <button onclick="filterRoadmapPhase(4)" class="btn btn-secondary phase-tab-btn" id="tab-phase-4">
+                Phase 4: Mock Simulation
+              </button>
+            </div>
+
+            <!-- Status Filter Tabs -->
+            <div style="display:flex; gap:6px; background:#F1F5F9; padding:4px; border-radius:8px;" id="status-filter-bar">
+              <button onclick="filterTaskStatus('all')" class="status-tab-btn active" id="tab-status-all">
+                All Tasks (<span id="status-count-all">0</span>)
+              </button>
+              <button onclick="filterTaskStatus('pending')" class="status-tab-btn" id="tab-status-pending">
+                Pending (<span id="status-count-pending">0</span>)
+              </button>
+              <button onclick="filterTaskStatus('completed')" class="status-tab-btn" id="tab-status-completed">
+                Completed (<span id="status-count-completed">0</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- 4-Phase Tasks Container -->
+          <div id="phases-container" style="display:flex; flex-direction:column; gap:24px; margin-bottom:32px;">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Bottom Navigation -->
+          <div style="display:flex; justify-content:center; gap:16px; margin:32px 0; flex-wrap:wrap;">
+            <button id="btn-bottom-download-pdf" class="btn btn-secondary" style="padding:14px 28px; font-weight:700; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" title="Download Roadmap Analysis as PDF">
+              <span>📥</span> <span>Download Roadmap PDF</span>
+            </button>
+            <a id="btn-bottom-analysis" href="analysis.html" class="btn btn-primary" style="padding:14px 28px; background:#4F46E5; text-decoration:none; font-weight:700;">
+              🔍 View Question-by-Question Deep Analysis →
+            </a>
+            <a href="interview-config.html" class="btn btn-primary" style="padding:14px 28px; background:#2563EB; text-decoration:none; font-weight:700;">
+              🚀 Start Targeted Mock Interview
+            </a>
+            <a href="dashboard.html" class="btn btn-secondary" style="padding:14px 28px; text-decoration:none; font-weight:600;">
+              📊 Back to Dashboard
+            </a>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/roadmap.js"></script>
+</body>
+</html>

@@ -9,6 +9,7 @@ class QuestionResponse(BaseModel):
     difficulty: str
     question_type: str
     expected_points: List[str]
+    is_skipped: Optional[bool] = False
     created_at: str
 
 class AnswerSubmitRequest(BaseModel):

@@ -21,4 +21,6 @@ class User(Base):
     resume_analyses = relationship("ResumeJDAnalysis", back_populates="user", cascade="all, delete-orphan")
     coding_interviews = relationship("CodingInterview", back_populates="user", cascade="all, delete-orphan")
     coding_submissions = relationship("CodingSubmission", back_populates="user", cascade="all, delete-orphan")
+    analysis_roadmaps = relationship("InterviewAnalysisRoadmap", back_populates="user", cascade="all, delete-orphan")
+    readiness_snapshots = relationship("ReadinessIntelligenceSnapshot", back_populates="user", cascade="all, delete-orphan")
 

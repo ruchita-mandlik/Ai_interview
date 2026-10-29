@@ -11,6 +11,9 @@ from backend.routes.ai import router as ai_router
 from backend.routes.users import router as users_router
 from backend.routes.recommendations import router as recommendations_router
 from backend.routes.voice import router as voice_router
+from backend.routes.roadmap import router as roadmap_router
+from backend.routes.readiness import router as readiness_router
+from backend.routes.intelligence import router as intelligence_router
 
 __all__ = [
     "auth_router",
@@ -26,4 +29,7 @@ __all__ = [
     "users_router",
     "recommendations_router",
     "voice_router",
+    "roadmap_router",
+    "readiness_router",
+    "intelligence_router",
 ]

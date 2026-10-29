@@ -1,9 +1,22 @@
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
+const appHistoryRewritePlugin = (): Plugin => ({
+  name: 'app-history-rewrite',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      const url = req.url || '';
+      if (url === '/app' || url.startsWith('/app?') || url.startsWith('/app#') || url.startsWith('/app/')) {
+        req.url = '/app.html';
+      }
+      next();
+    });
+  }
+});
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), appHistoryRewritePlugin()],
   server: {
     port: 3000,
     proxy: {
@@ -23,3 +36,4 @@ export default defineConfig({
     }
   }
 });
+

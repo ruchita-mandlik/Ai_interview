@@ -17,7 +17,10 @@ class InterviewQuestion(Base):
     difficulty = Column(String, nullable=False, default="Medium")
     additional_instruction = Column(Text, nullable=True)
     adaptation_reason = Column(Text, nullable=True)  # AI Adaptive Engine decision rationale
+    adaptive_action = Column(String, nullable=True, default="NEXT_TOPIC")  # INCREASE_DIFFICULTY, FOLLOW_UP, SIMPLIFY, CLARIFY, NEXT_TOPIC
+    assessment_objective = Column(Text, nullable=True)  # Targeted evaluation goal for this question
     is_follow_up = Column(Boolean, default=False, nullable=True)
+    is_skipped = Column(Boolean, default=False, nullable=True)
     parent_question_id = Column(String, nullable=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)

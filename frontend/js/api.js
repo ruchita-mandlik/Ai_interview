@@ -3,25 +3,38 @@ const API_BASE_URL = window.location.origin.includes("http") ? "" : "http://loca
 
 class API {
   static getToken() {
-    return localStorage.getItem("interviewai_token");
+    return localStorage.getItem("interviewai_token") || localStorage.getItem("token");
   }
 
   static setToken(token) {
-    localStorage.setItem("interviewai_token", token);
+    if (token) {
+      localStorage.setItem("interviewai_token", token);
+      localStorage.setItem("token", token);
+    }
   }
 
   static removeToken() {
     localStorage.removeItem("interviewai_token");
+    localStorage.removeItem("token");
     localStorage.removeItem("interviewai_user");
+    localStorage.removeItem("user");
   }
 
   static getUser() {
-    const u = localStorage.getItem("interviewai_user");
-    return u ? JSON.parse(u) : null;
+    const u = localStorage.getItem("interviewai_user") || localStorage.getItem("user");
+    try {
+      return u ? JSON.parse(u) : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   static setUser(user) {
-    localStorage.setItem("interviewai_user", JSON.stringify(user));
+    if (user) {
+      const uStr = typeof user === "string" ? user : JSON.stringify(user);
+      localStorage.setItem("interviewai_user", uStr);
+      localStorage.setItem("user", uStr);
+    }
   }
 
   static async request(endpoint, options = {}) {
@@ -89,6 +102,11 @@ class API {
     return API.request(endpoint, { method: "PUT", body: JSON.stringify(body) });
   }
 
+  static patch(endpoint, body) {
+    return API.request(endpoint, { method: "PATCH", body: JSON.stringify(body) });
+  }
+
+
   // Coding Interview API Endpoints
   static startCodingInterview(data) {
     return API.post("/api/coding/start", data);
@@ -108,6 +126,25 @@ class API {
 
   static getCodingResults(id) {
     return API.get(`/api/coding/${id}/results`);
+  }
+
+  // Intelligence & Memory API Endpoints
+  static getMemorySummary() {
+    return API.get("/api/intelligence/memory-summary");
+  }
+
+  static getSessionComparison(interviewId) {
+    return API.get(`/api/intelligence/session-comparison/${interviewId}`);
+  }
+
+  static getAnalyticsDashboard(params = {}) {
+    const qs = new URLSearchParams();
+    if (params.date_from) qs.set("date_from", params.date_from);
+    if (params.date_to) qs.set("date_to", params.date_to);
+    if (params.session_a_id) qs.set("session_a_id", params.session_a_id);
+    if (params.session_b_id) qs.set("session_b_id", params.session_b_id);
+    const qsStr = qs.toString();
+    return API.get(`/api/intelligence/analytics-dashboard${qsStr ? "?" + qsStr : ""}`);
   }
 }
 

@@ -62,6 +62,7 @@ async def get_interview_final_report(
 
     interview_summary = []
     for q in questions:
+        is_q_skipped = bool(getattr(q, "is_skipped", False))
         ans = db.query(Answer).filter(
             Answer.interview_id == interview_id,
             Answer.question_id == q.id
@@ -72,16 +73,72 @@ async def get_interview_final_report(
             Evaluation.question_id == q.id
         ).first() if ans else None
 
+        if is_q_skipped:
+            interview_summary.append({
+                "question": {
+                    "question": q.question_text,
+                    "topic": q.category or q.skill or interview.topic,
+                    "difficulty": q.difficulty,
+                    "is_skipped": True
+                },
+                "answer": "Question skipped by candidate.",
+                "is_skipped": True,
+                "evaluation": {
+                    "is_skipped": True,
+                    "feedback": "Question was skipped by candidate. Excluded from evaluation scoring.",
+                    "model_answer": "Reference benchmark solution available for review."
+                }
+            })
+            continue
+
+        st_list = []
+        if ev and ev.strengths:
+            try:
+                st_list = json.loads(ev.strengths) if ev.strengths.startswith("[") else [ev.strengths]
+            except Exception:
+                st_list = [ev.strengths]
+
+        mi_list = []
+        if ev and getattr(ev, "missing_concepts", None):
+            try:
+                mi_list = json.loads(ev.missing_concepts) if ev.missing_concepts.startswith("[") else [ev.missing_concepts]
+            except Exception:
+                mi_list = [ev.missing_concepts]
+        elif ev and ev.improvements:
+            try:
+                mi_list = json.loads(ev.improvements) if ev.improvements.startswith("[") else [ev.improvements]
+            except Exception:
+                mi_list = [ev.improvements]
+
+        inc_list = []
+        if ev and getattr(ev, "incorrect_claims", None):
+            try:
+                inc_list = json.loads(ev.incorrect_claims) if ev.incorrect_claims.startswith("[") else [ev.incorrect_claims]
+            except Exception:
+                inc_list = [ev.incorrect_claims]
+
         ev_dict = {
             "overall_score": ev.overall_score if ev else 70.0,
             "technical_correctness": ev.technical_correctness if ev else 70.0,
             "conceptual_completeness": ev.conceptual_completeness if ev else 70.0,
             "structural_clarity": ev.structural_clarity if ev else 70.0,
+            "depth_of_understanding": ev.depth_of_understanding if ev else 70.0,
+            "strengths": st_list,
+            "missing_concepts": mi_list,
+            "incorrect_claims": inc_list,
+            "feedback": ev.feedback if ev else None,
+            "model_answer": ev.model_answer if ev else None
         } if ev else {}
 
         interview_summary.append({
-            "question": {"question": q.question_text, "topic": q.category or interview.topic, "difficulty": q.difficulty},
+            "question": {
+                "question": q.question_text,
+                "topic": q.category or q.skill or interview.topic,
+                "difficulty": q.difficulty,
+                "is_skipped": False
+            },
             "answer": ans.answer_text if ans else "No answer provided",
+            "is_skipped": False,
             "evaluation": ev_dict
         })
 
@@ -89,7 +146,9 @@ async def get_interview_final_report(
         role=interview.target_role,
         experience=interview.experience_level,
         interview_type=interview.interview_type,
-        interview_summary=interview_summary
+        interview_summary=interview_summary,
+        job_description=interview.job_description,
+        additional_instructions=interview.additional_instructions
     )
 
     now_str = interview.created_at.isoformat() if interview.created_at else datetime.utcnow().isoformat()
@@ -97,13 +156,19 @@ async def get_interview_final_report(
     return FinalReportResponse(
         interview_id=interview.id,
         overall_score=float(report_data.get("overall_score", interview.total_score or 75.0)),
+        score_out_of_10=float(report_data.get("score_out_of_10", round((interview.total_score or 75.0) / 10.0, 1))),
         technical_knowledge_score=float(report_data.get("technical_knowledge_score", 78.0)),
         communication_score=float(report_data.get("communication_score", 80.0)),
         problem_solving_score=float(report_data.get("problem_solving_score", 76.0)),
         answer_quality_score=float(report_data.get("answer_quality_score", 78.0)),
-        strong_topics=list(report_data.get("strong_topics", [interview.topic or "Java"])),
-        weak_topics=list(report_data.get("weak_topics", ["System Design", "Distributed Systems"])),
+        strong_topics=list(report_data.get("strong_topics", [interview.topic or "Core Engineering"])),
+        weak_topics=list(report_data.get("weak_topics", ["Edge Case Robustness"])),
+        skill_gaps=list(report_data.get("skill_gaps", report_data.get("weak_topics", []))),
         recommendations=list(report_data.get("recommendations", ["Continue regular practice sessions."])),
+        communication_observations=report_data.get("communication_observations", "Clear verbal structure and precise technical articulation."),
+        readiness_estimate=report_data.get("readiness_estimate", "Demonstrates strong foundational command for this role."),
+        readiness_level=report_data.get("readiness_level", "Nearly Ready"),
         personalized_summary=str(report_data.get("personalized_summary", "Comprehensive interview session completed.")),
-        completed_at=now_str
+        completed_at=now_str,
+        question_results=report_data.get("question_results", [])
     )

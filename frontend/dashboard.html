@@ -27,6 +27,14 @@
           <li><a href="profile.html">👤 <span>Profile</span></a></li>
           <li><a href="#" onclick="API.removeToken(); window.location.href='login.html'; return false;">🚪 <span>Logout</span></a></li>
         </ul>
+
+        <div class="sidebar-menu-label" style="margin-top:18px;">AI Studio & Intelligence</div>
+        <ul class="sidebar-nav">
+          <li><a id="nav-ai-studio-adaptive" href="adaptive-interview.html" style="color:#60A5FA; font-weight:600;">🧠 <span>Adaptive Interview</span></a></li>
+          <li><a id="nav-ai-studio-analysis" href="analysis.html" style="color:#818CF8; font-weight:600;">🔍 <span>Deep AI Analysis</span></a></li>
+          <li><a id="nav-ai-studio-roadmap" href="roadmap.html" style="color:#34D399; font-weight:600;">📅 <span>Preparation Roadmap</span></a></li>
+          <li><a id="nav-ai-studio-memory" href="memory.html" style="color:#F59E0B; font-weight:600;">💡 <span>Interview Memory</span></a></li>
+        </ul>
       </div>
 
       <div class="sidebar-footer">
@@ -52,10 +60,21 @@
       <!-- Dashboard Content -->
       <main class="dashboard-content">
         <!-- Welcome Banner -->
-        <div class="welcome-banner">
-          <h1>Welcome back, <span id="welcome-user-name">Candidate</span>! 👋</h1>
-          <p>Ready to take the next step in your interview journey?</p>
+        <div class="welcome-banner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h1>Welcome back, <span id="welcome-user-name">Candidate</span>! 👋</h1>
+            <p>Ready to take the next step in your interview journey?</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <a href="interview-config.html" class="btn btn-secondary" style="background:rgba(255,255,255,0.15); color:#FFF; border-color:rgba(255,255,255,0.3); text-decoration:none;">
+              🚀 Start Practice
+            </a>
+            <a href="adaptive-interview.html" class="btn btn-primary" style="background:#6366F1; border-color:#818CF8; text-decoration:none;">
+              🧠 Adaptive AI Interview →
+            </a>
+          </div>
         </div>
+
 
         <!-- Dynamic Statistics Cards -->
         <div class="stats-grid">
@@ -81,6 +100,70 @@
               <div class="stat-val" id="stat-skills">0</div>
             </div>
             <div class="stat-icon">⚡</div>
+          </div>
+        </div>
+
+        <!-- AI Interview Readiness Intelligence Section -->
+        <div class="card" id="readiness-card" style="margin-bottom: 28px; border-left: 4px solid var(--primary); background: #FFFFFF;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                  <span>🎯</span> AI Interview Readiness Intelligence
+                </h3>
+                <span id="readiness-level-badge" class="badge badge-success" style="font-size: 0.8rem; padding: 4px 12px;">Calibrating...</span>
+                <span id="data-sufficiency-badge" style="font-size: 0.75rem; background: #EEF2FF; color: #4338CA; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Telemetry</span>
+              </div>
+              <p id="readiness-explanation" class="text-muted" style="font-size: 0.92rem; max-width: 700px; line-height: 1.5;">
+                Analyzing historical evaluations and question telemetry...
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button id="btn-recalculate-readiness" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>🔄</span> Recalculate
+              </button>
+              <a href="roadmap.html" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; text-decoration: none;">
+                View Roadmap →
+              </a>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 240px 1.2fr 1fr; gap: 20px;" class="readiness-grid-layout">
+            <!-- Readiness Gauge Box -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; text-align: center;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Overall Readiness Score</div>
+              <div id="readiness-gauge-val" style="font-size: 3.2rem; font-weight: 900; color: #2563EB; line-height: 1;">--%</div>
+              <div id="readiness-gauge-sub" style="font-size: 0.85rem; font-weight: 600; color: #10B981; margin-top: 8px;">Target Role: Software Developer</div>
+              <div id="readiness-evidence-meta" style="font-size: 0.75rem; color: #94A3B8; margin-top: 6px;">0 evaluated answers</div>
+            </div>
+
+            <!-- Dimensions Mastery Bars -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #0F172A; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Core Dimensions Mastery</div>
+              <div id="readiness-dimensions-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="text-muted" style="font-size:0.85rem;">Loading dimension telemetry...</div>
+              </div>
+            </div>
+
+            <!-- Recommended Next Step & Focus Areas -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: #0F172A; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                  <span>⚡</span> Recommended Next Step
+                </div>
+                <div id="readiness-next-action-box" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px;">
+                  <div id="readiness-next-action-title" style="font-weight: 700; font-size: 0.9rem; color: #1E293B; margin-bottom: 4px;">Take Adaptive Mock Interview</div>
+                  <div id="readiness-next-action-desc" style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">Practice high-yield technical and system design questions.</div>
+                  <a id="readiness-next-action-btn" href="interview-config.html" class="btn btn-primary" style="margin-top: 8px; padding: 4px 12px; font-size: 0.78rem; text-decoration: none; display: inline-block;">Start Practice →</a>
+                </div>
+              </div>
+              <div id="readiness-weakness-section" style="margin-top: 14px;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: #DC2626; margin-bottom: 6px; text-transform: uppercase;">Persistent Focus Areas</div>
+                <div id="readiness-weakness-tags" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <span style="font-size:0.75rem; color:#64748B;">No critical weaknesses identified</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

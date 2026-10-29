@@ -27,8 +27,10 @@ class DashboardService:
 
         coding_avg = round(sum(c.total_score for c in completed_coding) / len(completed_coding), 1) if completed_coding else 0.0
 
-        # Interview Readiness Score (Weighted: 50% Conceptual QA + 50% Coding Performance)
-        readiness_score = avg_score
+        # Synchronize with canonical ReadinessService
+        from backend.services.readiness_service import ReadinessService
+        readiness_snap = ReadinessService.get_latest_readiness(db, user)
+        readiness_score = readiness_snap.overall_readiness_score
 
         # Skill breakdown based on evaluations & coding submissions
         evaluations = db.query(Evaluation).join(Interview).filter(Interview.user_id == user.id).all()
@@ -102,6 +104,15 @@ class DashboardService:
         for item in combined_sorted:
             del item["created_at_dt"]
 
+        # Attach Interview Memory & Progress Intelligence
+        memory_data = None
+        try:
+            from backend.services.interview_memory_service import InterviewMemoryService
+            mem_summary = InterviewMemoryService.get_user_memory_summary(db, user)
+            memory_data = mem_summary.model_dump()
+        except Exception:
+            memory_data = None
+
         return {
             "user": {
                 "id": user.id,
@@ -118,7 +129,8 @@ class DashboardService:
                 "skills_in_progress": len(skill_progress)
             },
             "recent_activity": combined_sorted,
-            "skill_progress": skill_progress
+            "skill_progress": skill_progress,
+            "memory_intelligence": memory_data
         }
 
     @staticmethod

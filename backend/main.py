@@ -21,7 +21,10 @@ from backend.routes import (
     ai_router,
     users_router,
     recommendations_router,
-    voice_router
+    voice_router,
+    roadmap_router,
+    readiness_router,
+    intelligence_router
 )
 
 logger = logging.getLogger("uvicorn.error")
@@ -65,6 +68,9 @@ app.include_router(ai_router)
 app.include_router(users_router)
 app.include_router(recommendations_router)
 app.include_router(voice_router)
+app.include_router(roadmap_router)
+app.include_router(readiness_router)
+app.include_router(intelligence_router)
 
 # Directory configurations
 backend_dir = os.path.dirname(__file__)
@@ -99,7 +105,7 @@ def health_check():
         "ai_key_configured": bool(settings.GENAI_API_KEY or os.getenv("GENAI_API_KEY") or settings.GROQ_API_KEY)
     }
 
-# Serve React SPA Studio
+# Serve React SPA
 @app.get("/app")
 @app.get("/app/{full_path:path}")
 async def serve_react_spa(full_path: str = ""):
@@ -118,6 +124,20 @@ async def serve_html_page(page_name: str):
     if os.path.exists(file_path):
         return FileResponse(file_path)
     return JSONResponse(status_code=404, content={"detail": f"Page '{page_name}.html' not found"})
+
+@app.get("/memory")
+@app.get("/roadmap")
+@app.get("/analysis")
+@app.get("/dashboard")
+@app.get("/performance")
+@app.get("/history")
+@app.get("/profile")
+async def serve_clean_html_page(request: Request):
+    path_name = request.url.path.strip("/")
+    file_path = os.path.join(frontend_dir, f"{path_name}.html")
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    return JSONResponse(status_code=404, content={"detail": f"Page '{path_name}.html' not found"})
 
 @app.get("/")
 async def root():

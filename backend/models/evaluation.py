@@ -22,9 +22,13 @@ class Evaluation(Base):
     
     strengths = Column(Text, nullable=True)     # JSON formatted array string
     improvements = Column(Text, nullable=True)  # JSON formatted array string
+    missing_concepts = Column(Text, nullable=True) # JSON formatted array string
+    incorrect_claims = Column(Text, nullable=True) # JSON formatted array string
     feedback = Column(Text, nullable=True)
+    actionable_feedback = Column(Text, nullable=True)
     model_answer = Column(Text, nullable=True)
     communication_notes = Column(Text, nullable=True)
+    evaluation_type = Column(String, nullable=True, default="technical")
     
     created_at = Column(DateTime, default=datetime.utcnow)
 

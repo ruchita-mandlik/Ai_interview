@@ -6,6 +6,8 @@ from backend.models.answer import Answer
 from backend.models.evaluation import Evaluation
 from backend.models.resume_analysis import ResumeJDAnalysis
 from backend.models.coding_interview import CodingInterview, CodingQuestion, CodingSubmission
+from backend.models.roadmap import InterviewAnalysisRoadmap
+from backend.models.readiness import ReadinessIntelligenceSnapshot
 
 __all__ = [
     "User",
@@ -18,5 +20,7 @@ __all__ = [
     "CodingInterview",
     "CodingQuestion",
     "CodingSubmission",
+    "InterviewAnalysisRoadmap",
+    "ReadinessIntelligenceSnapshot",
 ]
 

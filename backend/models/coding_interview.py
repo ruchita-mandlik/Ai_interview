@@ -47,6 +47,7 @@ class CodingQuestion(Base):
     
     skill = Column(String, nullable=True, default="Algorithms")
     difficulty = Column(String, nullable=False, default="Medium")
+    hints = Column(Text, nullable=True) # JSON string list of progressive hints
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -85,7 +86,17 @@ class CodingSubmission(Base):
     
     submitted_at = Column(DateTime, default=datetime.utcnow)
 
+    # Backward compatibility properties
+    @property
+    def question(self):
+        return self.coding_question
+
+    @property
+    def code(self):
+        return self.submitted_code
+
     # Relationships
     coding_interview = relationship("CodingInterview", back_populates="submissions")
     coding_question = relationship("CodingQuestion", back_populates="submissions")
     user = relationship("User", back_populates="coding_submissions")
+

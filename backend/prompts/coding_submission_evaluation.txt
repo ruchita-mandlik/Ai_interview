@@ -39,7 +39,7 @@ Return ONLY a valid JSON object with the following exact keys:
   "optimization_suggestions": [
     "Consider pre-allocating memory for large inputs."
   ],
-  "code_review": "Detailed multi-paragraph professional review explaining logic, strengths, trade-offs, and bug analysis.",
+  "code_review": "Concise, evidence-based review (2-3 sentences) explaining logic, strengths, trade-offs, and bug analysis.",
   "model_solution": "Ideal, clean, optimal solution code in {language} with complexity comments."
 }}
 

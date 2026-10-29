@@ -12,6 +12,19 @@ class CodeRunRequest(BaseModel):
     question_id: str
     language: str = Field(default="python")
     code: str
+    custom_input: Optional[str] = None
+
+class CustomRunRequest(BaseModel):
+    code: str
+    language: str = Field(default="python")
+    custom_input: str = ""
+
+class CustomRunResultSchema(BaseModel):
+    input: str
+    actual_output: str
+    execution_time_ms: float = 0.0
+    error: Optional[str] = None
+    stdout: Optional[str] = None
 
 class CodingSubmissionRequest(BaseModel):
     question_id: str
@@ -33,6 +46,7 @@ class CodeRunResultSchema(BaseModel):
     passed_test_cases: int
     all_passed: bool
     results: List[TestCaseResultSchema]
+    custom_result: Optional[CustomRunResultSchema] = None
 
 class CodingQuestionSchema(BaseModel):
     id: str
@@ -43,6 +57,7 @@ class CodingQuestionSchema(BaseModel):
     output_format: Optional[str] = None
     constraints: Optional[str] = None
     starter_code: str
+    hints: List[str] = []
     sample_test_cases: List[Dict[str, Any]] = []
     skill: Optional[str] = "Algorithms"
     difficulty: str

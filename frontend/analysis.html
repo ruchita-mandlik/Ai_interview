@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep AI Analysis — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/interview.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg viewBox="0 0 24 24" style="width:28px; height:28px; fill:#2563EB;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>InterviewAI</span>
+        </div>
+
+        <div class="sidebar-menu-label">Main Menu</div>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+          <li><a href="interview-config.html">🚀 <span>Start Practice</span></a></li>
+          <li><a href="performance.html">📈 <span>My Performance</span></a></li>
+          <li><a href="history.html">📜 <span>Interview History</span></a></li>
+          <li><a href="profile.html">👤 <span>Profile</span></a></li>
+          <li><a href="#" onclick="API.removeToken(); window.location.href='login.html'; return false;">🚪 <span>Logout</span></a></li>
+        </ul>
+
+        <div class="sidebar-menu-label" style="margin-top:18px;">AI Studio & Intelligence</div>
+        <ul class="sidebar-nav">
+          <li><a id="nav-ai-studio-adaptive" href="adaptive-interview.html" style="color:#60A5FA; font-weight:600;">🧠 <span>Adaptive Interview</span></a></li>
+          <li><a id="nav-ai-studio-analysis" href="analysis.html" class="active" style="color:#818CF8; font-weight:600;">🔍 <span>Deep AI Analysis</span></a></li>
+          <li><a id="nav-ai-studio-roadmap" href="roadmap.html" style="color:#34D399; font-weight:600;">📅 <span>Preparation Roadmap</span></a></li>
+          <li><a id="nav-ai-studio-memory" href="memory.html" style="color:#F59E0B; font-weight:600;">💡 <span>Interview Memory</span></a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="sidebar-user-avatar">U</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sidebar-user-name">Candidate Name</div>
+          <div class="user-info-role" id="sidebar-user-role">Software Developer</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-title">Deep AI Performance Analysis</div>
+        <div class="topbar-actions">
+          <a id="topbar-roadmap-link" href="roadmap.html" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem; text-decoration:none; margin-right:8px;">
+            📅 View Roadmap
+          </a>
+          <button class="icon-btn" title="Notifications">🔔</button>
+          <a href="profile.html" class="user-avatar" style="width:36px; height:36px; text-decoration:none; font-size:0.9rem;">👤</a>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <main class="dashboard-content">
+        <!-- Session Selector & Header Banner -->
+        <div class="welcome-banner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+              <span class="badge badge-primary" style="background:#EEF2FF; color:#4338CA; font-weight:700;">Live AI Telemetry</span>
+              <span id="analysis-date-badge" style="font-size:0.8rem; color:#DBEAFE;">Oct 2026</span>
+            </div>
+            <h1 id="analysis-session-title" style="font-size:1.6rem; margin-bottom:4px;">Deep AI Interview Analysis</h1>
+            <p id="analysis-session-subtitle" style="color:#DBEAFE; font-size:0.95rem;">
+              Evidence-based rubric diagnostic, answer evaluation, and knowledge gap extraction.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px;">
+              <label for="session-select" style="font-size:0.75rem; color:#DBEAFE; display:block; margin-bottom:2px;">Select Session:</label>
+              <select id="session-select" style="background:transparent; color:#FFFFFF; border:none; outline:none; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                <option value="" style="color:#000;">Loading sessions...</option>
+              </select>
+            </div>
+            <button id="btn-force-refresh-analysis" class="btn btn-secondary" style="background:rgba(255,255,255,0.2); color:#FFF; border-color:rgba(255,255,255,0.35);">
+              <span>⚡</span> Re-Analyze
+            </button>
+            <a id="btn-jump-roadmap" href="roadmap.html" class="btn btn-primary" style="background:#10B981; border-color:#059669; text-decoration:none;">
+              📅 Preparation Roadmap →
+            </a>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="analysis-loading" class="card" style="text-align:center; padding:50px 20px; display:block;">
+          <div style="font-size:2rem; margin-bottom:12px;">⏳</div>
+          <h3 style="color:#1E293B; margin-bottom:8px;">Synthesizing Evidence & AI Rubrics...</h3>
+          <p class="text-muted" style="max-width:500px; margin:0 auto;">
+            Analyzing your submitted answers against industry competency benchmarks via Gemini 3.8 Flash.
+          </p>
+        </div>
+
+        <!-- Main Analysis View Container -->
+        <div id="analysis-content" style="display:none;">
+          <!-- Top Row: Executive Summary & Rubric Dimension Breakdown -->
+          <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:24px; margin-bottom:24px;">
+            <!-- Executive Summary Card -->
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                  <span class="text-muted" style="font-size:0.8rem; font-weight:700; text-transform:uppercase;">EXECUTIVE EVALUATION SUMMARY</span>
+                  <span id="analysis-readiness-level" class="badge badge-success">Interview Ready</span>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:12px;">
+                  <div id="analysis-overall-score" style="font-size:3rem; font-weight:900; color:#2563EB; line-height:1;">0%</div>
+                  <div style="font-size:0.9rem; color:var(--text-muted); font-weight:600;">Overall Weighted Score</div>
+                </div>
+                <p id="analysis-executive-summary" style="font-size:0.95rem; color:#334155; line-height:1.6; margin-bottom:16px;">
+                  <!-- Dynamic summary -->
+                </p>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:12px 14px; font-size:0.85rem; color:#475569;">
+                <strong style="color:#0F172A;">Hiring Assessment:</strong> <span id="analysis-hiring-verdict">Strong candidate for target level.</span>
+              </div>
+            </div>
+
+            <!-- 5-Dimension Rubric Breakdown -->
+            <div class="card">
+              <h3 style="font-size:1.05rem; margin-bottom:18px;">EVALUATION RUBRIC BREAKDOWN (5 DIMENSIONS)</h3>
+              <div id="rubric-bars-container" style="display:flex; flex-direction:column; gap:14px;">
+                <!-- Dynamically generated dimension bars -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Demonstrated Strengths & Critical Gaps Grid -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:24px;">
+            <!-- Strengths -->
+            <div class="card" style="border-top:4px solid #10B981;">
+              <h3 style="color:#065F46; font-size:1.1rem; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+                <span>✅</span> Demonstrated Strengths
+              </h3>
+              <div id="strengths-list-container" style="display:flex; flex-direction:column; gap:12px;">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Gaps -->
+            <div class="card" style="border-top:4px solid #EF4444;">
+              <h3 style="color:#991B1B; font-size:1.1rem; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+                <span>⚠️</span> Identified Skill Gaps & Misconceptions
+              </h3>
+              <div id="gaps-list-container" style="display:flex; flex-direction:column; gap:12px;">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Question-by-Question Deep Analysis Feed -->
+          <div class="card" style="margin-bottom:24px;">
+            <div style="padding-bottom:16px; border-bottom:1px solid var(--border-color); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="font-size:1.15rem; font-weight:800; color:#0F172A;">QUESTION-BY-QUESTION EVIDENCE SCRUTINY</h3>
+                <p class="text-muted" style="font-size:0.85rem; margin-top:2px;">Compare your actual answers with ideal benchmark models and AI critique.</p>
+              </div>
+              <span id="question-count-badge" style="font-size:0.8rem; background:#EEF2FF; color:#4338CA; font-weight:700; padding:4px 10px; border-radius:6px;">
+                0 Questions Analyzed
+              </span>
+            </div>
+
+            <div id="questions-analysis-feed" style="display:flex; flex-direction:column; gap:24px;">
+              <!-- Question analysis cards populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Diagnostic Reassessment Questions -->
+          <div class="card" id="reassessment-section" style="margin-bottom:24px; background:#F8FAFC; border:1px solid #CBD5E1;">
+            <div style="margin-bottom:16px;">
+              <h3 style="font-size:1.1rem; color:#1E293B; display:flex; align-items:center; gap:8px;">
+                <span>🎯</span> Targeted Diagnostic Reassessment Drills
+              </h3>
+              <p class="text-muted" style="font-size:0.85rem; margin-top:2px;">
+                Test whether you have remediated the gaps identified in this session. Click to reveal benchmark answers.
+              </p>
+            </div>
+            <div id="reassessment-drills-container" style="display:flex; flex-direction:column; gap:14px;">
+              <!-- Reassessment cards populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div style="display:flex; justify-content:center; gap:16px; margin:32px 0; flex-wrap:wrap;">
+            <a id="btn-bottom-roadmap" href="roadmap.html" class="btn btn-primary" style="padding:14px 32px; background:#10B981; text-decoration:none; font-size:1rem;">
+              📅 View Personalized Preparation Roadmap →
+            </a>
+            <a href="interview-config.html" class="btn btn-secondary" style="padding:14px 28px; text-decoration:none;">
+              🚀 Try Another Mock Interview
+            </a>
+            <a href="dashboard.html" class="btn btn-secondary" style="padding:14px 28px; text-decoration:none;">
+              📊 Back to Dashboard
+            </a>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/analysis.js"></script>
+</body>
+</html>

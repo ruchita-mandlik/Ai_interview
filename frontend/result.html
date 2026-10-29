@@ -31,6 +31,77 @@
       <div class="score-circle" id="overall-score-val">0%</div>
     </div>
 
+    <!-- Session-to-Session Progress Comparison Card -->
+    <div class="card" id="session-comparison-card" style="margin-bottom: 24px; border-left: 4px solid var(--primary); background: #FFFFFF;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; display: flex; align-items: center; gap: 6px;">
+              <span>📈</span> SESSION-TO-SESSION PROGRESS COMPARISON
+            </h3>
+            <span id="comparison-trend-badge" class="badge badge-primary" style="font-size: 0.8rem; padding: 4px 10px;">Calibrating...</span>
+          </div>
+          <p id="comparison-explanation" class="text-muted" style="font-size: 0.92rem; margin: 0; line-height: 1.5;">
+            Comparing your performance against previous mock sessions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Score Compare Bar -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Previous Session Score</div>
+          <div id="comp-prev-score" style="font-size: 1.8rem; font-weight: 800; color: #475569; margin: 4px 0;">--%</div>
+          <div id="comp-prev-meta" style="font-size: 0.75rem; color: #94A3B8;">Baseline</div>
+        </div>
+
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #1E40AF; text-transform: uppercase;">Latest Session Score</div>
+          <div id="comp-curr-score" style="font-size: 1.8rem; font-weight: 800; color: #2563EB; margin: 4px 0;">--%</div>
+          <div id="comp-curr-meta" style="font-size: 0.75rem; color: #3B82F6;">This Interview</div>
+        </div>
+
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Net Score Change</div>
+          <div id="comp-delta-score" style="font-size: 1.8rem; font-weight: 800; color: #10B981; margin: 4px 0;">--</div>
+          <div id="comp-delta-meta" style="font-size: 0.75rem; color: #64748B;">Progression Trend</div>
+        </div>
+      </div>
+
+      <!-- Comparison Details Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <!-- Repeated Mistakes -->
+        <div style="background: #FFF5F5; border: 1px solid #FED7D7; border-radius: 8px; padding: 14px;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #C53030; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>⚠️</span> Repeated Mistakes (Multi-Session)
+          </div>
+          <ul id="comp-repeated-mistakes" style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: #742A2A; line-height: 1.5;">
+            <li>Analyzing history...</li>
+          </ul>
+        </div>
+
+        <!-- Newly Resolved Weaknesses -->
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #15803D; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>✨</span> Newly Resolved Weaknesses
+          </div>
+          <ul id="comp-resolved-weaknesses" style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: #166534; line-height: 1.5;">
+            <li>Analyzing history...</li>
+          </ul>
+        </div>
+
+        <!-- Next Recommended Actions -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #1E293B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>🎯</span> Recommended Next Actions
+          </div>
+          <ul id="comp-next-actions" style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: #475569; line-height: 1.5;">
+            <li>Analyzing history...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <!-- Rubric Dimension Breakdown Card -->
     <div class="card">
       <h3 style="margin-bottom:20px;">EVALUATION RUBRIC BREAKDOWN</h3>
@@ -110,8 +181,14 @@
     </div>
 
     <!-- Action Buttons -->
-    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:40px;">
-      <a href="interview-config.html" class="btn btn-primary" style="padding:14px 28px;">Try Another Interview</a>
+    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:40px; flex-wrap:wrap;">
+      <a id="btn-view-deep-analysis" href="analysis.html" class="btn btn-primary" style="padding:14px 28px; background:#4F46E5; text-decoration:none;">
+        🔍 View Deep AI Analysis & Diagnostic Rubrics →
+      </a>
+      <a id="btn-view-roadmap" href="roadmap.html" class="btn btn-primary" style="padding:14px 28px; background:#059669; text-decoration:none;">
+        📅 View Personalized Preparation Roadmap →
+      </a>
+      <a href="interview-config.html" class="btn btn-secondary" style="padding:14px 28px;">Try Another Interview</a>
       <a href="performance.html" class="btn btn-secondary" style="padding:14px 28px;">View Performance</a>
       <a href="dashboard.html" class="btn btn-secondary" style="padding:14px 28px;">Back to Dashboard</a>
     </div>

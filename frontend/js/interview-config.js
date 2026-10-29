@@ -1,236 +1,280 @@
-/* Interview Configuration Controller - Resume + JD Intelligence */
+/* Dynamic Interview Configuration Controller - ChatGPT-Grade AI Flow */
 
-function switchConfigMode(mode) {
-  const tabResume = document.getElementById("tab-btn-resume");
-  const tabStandard = document.getElementById("tab-btn-standard");
-  const containerResume = document.getElementById("mode-resume-container");
-  const containerStandard = document.getElementById("mode-standard-container");
-
-  if (mode === "resume") {
-    tabResume.classList.add("active");
-    tabStandard.classList.remove("active");
-    containerResume.style.display = "block";
-    containerStandard.style.display = "none";
-  } else {
-    tabStandard.classList.add("active");
-    tabResume.classList.remove("active");
-    containerStandard.style.display = "block";
-    containerResume.style.display = "none";
+// Global helper functions for chips & question selectors (called from inline onclick)
+function applyChip(fieldId, value) {
+  const input = document.getElementById(fieldId);
+  if (input) {
+    input.value = value;
+    input.focus();
+    // Dispatch input event for any reactive listeners
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  requireAuth();
+function appendSkill(skillName) {
+  const input = document.getElementById("skills_input");
+  if (!input) return;
+  const current = input.value.trim();
+  if (!current) {
+    input.value = skillName;
+  } else {
+    const list = current.split(",").map(s => s.trim().toLowerCase());
+    if (!list.includes(skillName.toLowerCase())) {
+      input.value = `${current}, ${skillName}`;
+    }
+  }
+  input.focus();
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
 
-  // Check URL query params for preset
+function updateQuestionCount(count) {
+  const hiddenInput = document.getElementById("num_questions");
+  if (hiddenInput) {
+    hiddenInput.value = count;
+  }
+
+  [3, 5, 10].forEach(n => {
+    const box = document.getElementById(`q-box-${n}`);
+    if (box) {
+      if (n === count) {
+        box.style.borderColor = "#6366F1";
+        box.style.background = "#EEF2FF";
+        box.style.color = "#4338CA";
+        box.style.fontWeight = "700";
+      } else {
+        box.style.borderColor = "#CBD5E1";
+        box.style.background = "#F8FAFC";
+        box.style.color = "#475569";
+        box.style.fontWeight = "600";
+      }
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Check auth
+  if (typeof requireAuth === "function") {
+    requireAuth();
+  }
+
+  // Populate user profile info in sidebar
+  try {
+    const user = API.getUser();
+    if (user) {
+      const avatarEl = document.getElementById("sidebar-avatar");
+      const nameEl = document.getElementById("sidebar-user-name");
+      const roleEl = document.getElementById("sidebar-user-role");
+      if (nameEl) nameEl.textContent = user.name || user.email || "Candidate";
+      if (avatarEl) avatarEl.textContent = (user.name ? user.name[0] : "U").toUpperCase();
+      if (roleEl && user.target_role) roleEl.textContent = user.target_role;
+    }
+  } catch (e) {
+    console.debug("User info load skipped", e);
+  }
+
+  // Handle URL presets if any
   const urlParams = new URLSearchParams(window.location.search);
   const presetType = urlParams.get("type");
-  const presetMode = urlParams.get("mode");
+  const presetRole = urlParams.get("role");
+  const presetDiff = urlParams.get("diff");
 
   if (presetType) {
-    const typeSelect = document.getElementById("interview_type");
-    if (typeSelect) typeSelect.value = presetType;
+    const typeInput = document.getElementById("interview_type");
+    if (typeInput) typeInput.value = presetType;
+  }
+  if (presetRole) {
+    const roleInput = document.getElementById("target_role");
+    if (roleInput) roleInput.value = presetRole;
+  }
+  if (presetDiff) {
+    const diffInput = document.getElementById("difficulty");
+    if (diffInput) diffInput.value = presetDiff;
   }
 
-  if (presetMode === "standard") {
-    switchConfigMode("standard");
-  } else {
-    switchConfigMode("resume");
-  }
-
-  // PDF File Input Listener
+  // Setup PDF Dropzone and file selection
   const fileInput = document.getElementById("resume_file_input");
-  const fileNameDisplay = document.getElementById("pdf-file-name");
   const dropzone = document.getElementById("pdf-dropzone");
+  const fileNameDisplay = document.getElementById("pdf-file-name");
 
   if (fileInput && fileNameDisplay) {
-    fileInput.addEventListener("change", (e) => {
+    fileInput.addEventListener("change", () => {
       if (fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
-        if (!file.name.toLowerCase().endswith(".pdf") && !file.name.toLowerCase().endsWith(".pdf")) {
-          showToast("Please select a PDF file (.pdf)", "error");
+        if (!file.name.toLowerCase().endsWith(".pdf")) {
+          showToast("Please upload a PDF file (.pdf)", "error");
           fileInput.value = "";
-          fileNameDisplay.innerHTML = "Click to choose or drag & drop your PDF Resume";
+          fileNameDisplay.textContent = "Choose PDF or drag & drop";
           return;
         }
-        fileNameDisplay.innerHTML = `✅ Selected: <strong>${file.name}</strong> (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+        fileNameDisplay.innerHTML = `✅ <strong>${file.name}</strong> (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+        if (dropzone) {
+          dropzone.style.borderColor = "#10B981";
+          dropzone.style.background = "#ECFDF5";
+        }
       }
     });
 
-    // Drag & drop handlers
     if (dropzone) {
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
+      ["dragenter", "dragover"].forEach(evtName => {
+        dropzone.addEventListener(evtName, (e) => {
           e.preventDefault();
-          dropzone.classList.add('active');
+          e.stopPropagation();
+          dropzone.classList.add("dragover");
         }, false);
       });
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
+
+      ["dragleave", "drop"].forEach(evtName => {
+        dropzone.addEventListener(evtName, (e) => {
           e.preventDefault();
-          dropzone.classList.remove('active');
+          e.stopPropagation();
+          dropzone.classList.remove("dragover");
         }, false);
       });
-      dropzone.addEventListener('drop', (e) => {
+
+      dropzone.addEventListener("drop", (e) => {
         const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files && files[0]) {
-          fileInput.files = files;
-          fileInput.dispatchEvent(new Event('change'));
+        if (dt && dt.files && dt.files[0]) {
+          fileInput.files = dt.files;
+          fileInput.dispatchEvent(new Event("change"));
         }
       });
     }
   }
 
-  // Resume + JD Analysis Form Submission
-  const resumeForm = document.getElementById("resume-analysis-form");
-  if (resumeForm) {
-    resumeForm.addEventListener("submit", async (e) => {
+  // Form Submission
+  const form = document.getElementById("dynamic-interview-form");
+  const errorBanner = document.getElementById("config-error-banner");
+  const launchBtn = document.getElementById("btn-launch-interview");
+
+  if (form) {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const errEl = document.getElementById("resume-form-error");
-      const btn = document.getElementById("btn-analyze-resume");
-      if (errEl) errEl.textContent = "";
 
-      const file = fileInput.files[0];
-      const jobDesc = document.getElementById("job_description_input").value.trim();
-      const jobTitle = document.getElementById("resume_job_title").value.trim() || "Software Developer";
+      if (launchBtn && launchBtn.disabled) {
+        return; // Prevent duplicate concurrent submissions
+      }
 
-      if (!file) {
-        if (errEl) errEl.textContent = "Please upload a PDF resume file.";
+      if (errorBanner) {
+        errorBanner.style.display = "none";
+        errorBanner.textContent = "";
+      }
+
+      const targetRole = (document.getElementById("target_role")?.value || "").trim();
+      const experienceLevel = (document.getElementById("experience_level")?.value || "").trim();
+      const skillsRaw = (document.getElementById("skills_input")?.value || "").trim();
+      const jobDescription = (document.getElementById("job_description")?.value || "").trim();
+      const interviewType = (document.getElementById("interview_type")?.value || "").trim();
+      const difficulty = (document.getElementById("difficulty")?.value || "").trim();
+      const numQuestions = parseInt(document.getElementById("num_questions")?.value || "5", 10);
+      const resumeText = (document.getElementById("resume_text")?.value || "").trim();
+      const additionalInstructions = (document.getElementById("additional_instructions")?.value || "").trim();
+
+      if (!targetRole) {
+        if (errorBanner) {
+          errorBanner.textContent = "Please specify a Target Position or Job Role.";
+          errorBanner.style.display = "block";
+        }
         return;
       }
-      if (!jobDesc || jobDesc.length < 10) {
-        if (errEl) errEl.textContent = "Please provide a valid Job Description.";
-        return;
+
+      // Parse skills into array
+      const skillsList = skillsRaw
+        ? skillsRaw.split(",").map(s => s.trim()).filter(Boolean)
+        : [];
+
+      // Disable button & show spinner
+      if (launchBtn) {
+        launchBtn.disabled = true;
+        launchBtn.innerHTML = `
+          <div style="display:inline-block; width:18px; height:18px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+          <span>Crafting Real-Time Questions with Gemini AI...</span>
+        `;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = `<span class="loading-spinner"></span> Extracting Skills & Analyzing Match...`;
+      let resumeAnalysisId = null;
 
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("job_description", jobDesc);
-        formData.append("job_title", jobTitle);
+      // Handle PDF resume upload if provided
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          if (launchBtn) {
+            launchBtn.innerHTML = `
+              <div style="display:inline-block; width:18px; height:18px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+              <span>Analyzing PDF Resume & Skill Gaps...</span>
+            `;
+          }
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+          formData.append("job_description", jobDescription || `Target Role: ${targetRole}`);
+          formData.append("job_title", targetRole);
 
-        const analysis = await API.postFormData("/api/resume-analysis/analyze", formData);
-        showToast("Resume & Job Description Analysis Completed!", "success");
-
-        renderSkillMatchReport(analysis);
-        btn.disabled = false;
-        btn.innerHTML = "🔍 Re-analyze Resume & Job Description";
-
-      } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = "🔍 Analyze Skill Match & Prepare Interview →";
-        if (errEl) errEl.textContent = err.message;
-        showToast(err.message, "error");
+          const analysis = await API.postFormData("/api/resume-analysis/analyze", formData);
+          if (analysis && analysis.id) {
+            resumeAnalysisId = analysis.id;
+          }
+        } catch (uploadErr) {
+          console.warn("Resume PDF analysis warning:", uploadErr);
+          // If resume analysis fails, proceed with standard generation rather than blocking interview
+        }
       }
-    });
-  }
 
-  // Render Skill Match Intelligence Report
-  function renderSkillMatchReport(analysis) {
-    const reportCard = document.getElementById("skill-match-report");
-    const pctVal = document.getElementById("match-pct-value");
-    const summaryText = document.getElementById("match-summary-text");
-    const activeAnalysisId = document.getElementById("active_analysis_id");
-
-    const matchedContainer = document.getElementById("pill-matched-container");
-    const missingContainer = document.getElementById("pill-missing-container");
-    const priorityContainer = document.getElementById("pill-priority-container");
-
-    if (!reportCard) return;
-
-    activeAnalysisId.value = analysis.id;
-    pctVal.textContent = `${Math.round(analysis.match_percentage)}%`;
-    summaryText.textContent = analysis.analysis_summary || "Personalized match profile generated based on your resume and job requirements.";
-
-    // Render Pills
-    matchedContainer.innerHTML = (analysis.matched_skills || []).map(s => 
-      `<span class="skill-pill skill-pill-matched">✓ ${s}</span>`
-    ).join("") || `<span class="text-muted" style="font-size:0.8rem;">No exact overlaps</span>`;
-
-    missingContainer.innerHTML = (analysis.missing_skills || []).map(s => 
-      `<span class="skill-pill skill-pill-missing">⚠ ${s}</span>`
-    ).join("") || `<span class="text-muted" style="font-size:0.8rem;">None (Full match)</span>`;
-
-    priorityContainer.innerHTML = (analysis.priority_skills || []).map(s => 
-      `<span class="skill-pill skill-pill-priority">🎯 ${s}</span>`
-    ).join("") || `<span class="text-muted" style="font-size:0.8rem;">Core Role Skills</span>`;
-
-    reportCard.style.display = "block";
-    reportCard.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  // Start Personalized Interview Submission
-  const startPersonalizedForm = document.getElementById("start-personalized-form");
-  if (startPersonalizedForm) {
-    startPersonalizedForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("btn-start-personalized");
-      const analysisId = document.getElementById("active_analysis_id").value;
-      const jobTitle = document.getElementById("resume_job_title").value.trim() || "Software Developer";
-
+      // Build payload for /api/interviews/start (Standard Mock Practice)
       const payload = {
-        interview_type: document.getElementById("p_interview_type").value,
-        target_role: jobTitle,
-        experience_level: "Intermediate",
-        topic: jobTitle,
-        difficulty: document.getElementById("p_difficulty").value,
-        num_questions: parseInt(document.getElementById("p_num_questions").value, 10),
-        resume_analysis_id: analysisId || null
+        target_role: targetRole,
+        role: targetRole,
+        experience_level: experienceLevel || "Mid-to-Senior",
+        topic: targetRole,
+        topics: skillsList.length ? skillsList : [targetRole],
+        skills: skillsList,
+        job_description: jobDescription || null,
+        interview_type: interviewType || "Technical Mock",
+        difficulty: difficulty || "Medium",
+        num_questions: numQuestions,
+        total_questions: numQuestions,
+        resume_text: resumeText || null,
+        additional_instructions: additionalInstructions || null,
+        resume_analysis_id: resumeAnalysisId,
+        mode: "standard",
+        is_adaptive: false
       };
 
-      btn.disabled = true;
-      btn.innerHTML = `<span class="loading-spinner"></span> Personalizing AI Questions...`;
-
       try {
+        if (launchBtn) {
+          launchBtn.innerHTML = `
+            <div style="display:inline-block; width:18px; height:18px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+            <span>Generating Structured Mock Questions with Gemini...</span>
+          `;
+        }
+
         const interview = await API.post("/api/interviews/start", payload);
-        showToast("Personalized Interview Created!", "success");
+
+        if (!interview || !interview.id) {
+          throw new Error("Interview creation failed. Missing interview ID from server.");
+        }
+
+        showToast("Standard Mock Interview Room Initialized!", "success");
+
+        // Redirect to standard mock interview room
         setTimeout(() => {
           window.location.href = `interview.html?id=${interview.id}`;
-        }, 800);
+        }, 500);
+
       } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = "🚀 Start Personalized AI Interview →";
-        showToast(err.message, "error");
-      }
-    });
-  }
-
-  // Standard Config Form Submission
-  const standardForm = document.getElementById("interview-config-form");
-  if (standardForm) {
-    standardForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = standardForm.querySelector("button[type='submit']");
-      const errEl = document.getElementById("config-error");
-      if (errEl) errEl.textContent = "";
-
-      const payload = {
-        interview_type: document.getElementById("interview_type").value,
-        target_role: document.getElementById("target_role").value,
-        experience_level: document.getElementById("experience_level").value,
-        topic: document.getElementById("topic").value,
-        difficulty: document.getElementById("difficulty").value,
-        num_questions: parseInt(document.getElementById("num_questions").value, 10)
-      };
-
-      btn.disabled = true;
-      btn.innerHTML = `<span class="loading-spinner"></span> Generating AI Questions...`;
-
-      try {
-        const interview = await API.post("/api/interviews/start", payload);
-        showToast("Interview created! Loading questions...", "success");
-        setTimeout(() => {
-          window.location.href = `interview.html?id=${interview.id}`;
-        }, 800);
-      } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = "Start Standard Interview →";
-        if (errEl) errEl.textContent = err.message;
-        showToast(err.message, "error");
+        console.error("Failed to launch interview:", err);
+        if (launchBtn) {
+          launchBtn.disabled = false;
+          launchBtn.innerHTML = `<span>🚀 Launch Standard Mock Interview Session →</span>`;
+        }
+        if (errorBanner) {
+          errorBanner.innerHTML = `
+            <strong>Unable to launch AI interview:</strong> ${err.message || "An unexpected error occurred."}<br>
+            <span style="font-size:0.85rem; font-weight:400; color:#B91C1C;">
+              If this is a Gemini API rate limit or quota issue, please verify credentials or retry in a few moments.
+            </span>
+          `;
+          errorBanner.style.display = "block";
+          errorBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        showToast(err.message || "Interview launch failed", "error");
       }
     });
   }

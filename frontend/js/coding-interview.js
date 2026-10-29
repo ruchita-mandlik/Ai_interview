@@ -65,9 +65,48 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Render Sample Test Cases Cards
       renderSampleTestCases(currentQuestion.sample_test_cases || []);
+
+      // Render Progressive Hints
+      renderHints(currentQuestion.hints || []);
     } catch (err) {
       showToast(err.message || "Failed to load coding interview", "error");
     }
+  }
+
+  function renderHints(hints) {
+    const wrapper = document.getElementById("hints-wrapper");
+    const container = document.getElementById("hints-container");
+    if (!wrapper || !container) return;
+
+    if (!hints || hints.length === 0) {
+      wrapper.style.display = "none";
+      return;
+    }
+
+    wrapper.style.display = "block";
+    container.innerHTML = "";
+    hints.forEach((h, idx) => {
+      const card = document.createElement("div");
+      card.style.cssText = "background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 6px; overflow: hidden;";
+      card.innerHTML = `
+        <button style="width: 100%; padding: 8px 12px; background: transparent; border: none; color: #FCD34D; font-size: 0.82rem; font-weight: 700; display: flex; justify-content: space-between; cursor: pointer; text-align: left;">
+          <span>💡 Hint ${idx + 1} (Click to Reveal)</span>
+          <span class="hint-arrow">▶</span>
+        </button>
+        <div class="hint-content" style="display: none; padding: 8px 12px; border-top: 1px solid rgba(245, 158, 11, 0.2); font-size: 0.85rem; color: #F8FAFC;">
+          ${escapeHtml(h)}
+        </div>
+      `;
+      const btn = card.querySelector("button");
+      const content = card.querySelector(".hint-content");
+      const arrow = card.querySelector(".hint-arrow");
+      btn.addEventListener("click", () => {
+        const isHidden = content.style.display === "none";
+        content.style.display = isHidden ? "block" : "none";
+        arrow.textContent = isHidden ? "▼" : "▶";
+      });
+      container.appendChild(card);
+    });
   }
 
   function renderSampleTestCases(cases) {

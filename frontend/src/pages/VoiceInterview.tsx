@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Interview, Question, Evaluation, FinalReportResponse } from '../types';
-import { interviewAPI, aiAPI, voiceAPI } from '../services/api';
+import { Interview, Question, Evaluation, FinalReportResponse, AdaptiveDecision } from '../types';
+import { interviewAPI, aiAPI, voiceAPI, analysisAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Mic,
@@ -22,6 +22,10 @@ import {
   Clock,
   Brain,
   HelpCircle,
+  Zap,
+  Target,
+  Compass,
+  Layers,
   X
 } from 'lucide-react';
 
@@ -29,12 +33,14 @@ interface VoiceInterviewProps {
   onToast: (msg: string, type?: string) => void;
   openAuthModal: () => void;
   setActiveTab: (tab: string) => void;
+  setSelectedInterviewId?: (id: string | null) => void;
 }
 
 export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
   onToast,
   openAuthModal,
-  setActiveTab
+  setActiveTab,
+  setSelectedInterviewId
 }) => {
   const { isAuthenticated, user } = useAuth();
 
@@ -53,8 +59,12 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [questionIndex, setQuestionIndex] = useState(1);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [adaptiveDecision, setAdaptiveDecision] = useState<AdaptiveDecision | null>(null);
+  const [trackedGaps, setTrackedGaps] = useState<string[]>([]);
   const [finalReport, setFinalReport] = useState<FinalReportResponse | null>(null);
+  const [expandedQuestionIdx, setExpandedQuestionIdx] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [skipLoading, setSkipLoading] = useState(false);
   const [nextBtnLabel, setNextBtnLabel] = useState("Proceed to Next Question");
 
   // Timer State
@@ -345,6 +355,15 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
       );
 
       setEvaluation(res.evaluation);
+      if (res.adaptive_decision) {
+        setAdaptiveDecision(res.adaptive_decision);
+      }
+      if (res.knowledge_gaps && Array.isArray(res.knowledge_gaps)) {
+        setTrackedGaps(res.knowledge_gaps);
+      }
+      if (res.current_difficulty) {
+        setDifficulty(res.current_difficulty);
+      }
 
       if (res.follow_up_question) {
         setCurrentQuestion(res.follow_up_question);
@@ -376,6 +395,12 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
       try {
         const rep = await aiAPI.getReport(interview.id);
         setFinalReport(rep);
+        if (interview.id) {
+          if (setSelectedInterviewId) setSelectedInterviewId(interview.id);
+          analysisAPI.generate(interview.id).catch(err => {
+            console.warn("Background deep analysis generation (voice):", err);
+          });
+        }
       } catch (err: any) {
         onToast("Failed to compile final evaluation report", "error");
       } finally {
@@ -386,35 +411,48 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
       setFinalTranscript("");
       setLiveInterim("");
       setEvaluation(null);
+      setAdaptiveDecision(null);
     }
   };
 
   // 9. Skip Question
   const handleSkip = async () => {
-    if (!interview) return;
+    if (!interview || loading || skipLoading) return;
     if (!window.confirm("Skip current question and advance to the next topic?")) return;
 
     stopSpeaking();
     stopListening();
-    setLoading(true);
+    setSkipLoading(true);
     try {
-      const nextQ = await interviewAPI.skipQuestion(interview.id);
-      if (nextQ) {
+      const activeQId = currentQuestion?.id;
+      const res = await interviewAPI.skipQuestion(interview.id, activeQId);
+      const isCompleted = Boolean(res?.interview_completed || res?.status === "completed" || (!res?.next_question && !res?.id));
+      if (isCompleted) {
+        onToast("Interview completed. Compiling final performance report...", "info");
+        const rep = await aiAPI.getReport(interview.id);
+        setFinalReport(rep);
+        if (interview.id) {
+          if (setSelectedInterviewId) setSelectedInterviewId(interview.id);
+          analysisAPI.generate(interview.id).catch(err => {
+            console.warn("Background deep analysis generation on voice skip:", err);
+          });
+        }
+      } else {
+        const nextQ = res?.next_question || res;
         setCurrentQuestion(nextQ);
         setQuestionIndex(prev => prev + 1);
         setUserEditedAnswer("");
         setFinalTranscript("");
         setLiveInterim("");
         setEvaluation(null);
+        setAdaptiveDecision(null);
         onToast("Skipped to next question.", "info");
-      } else {
-        const rep = await aiAPI.getReport(interview.id);
-        setFinalReport(rep);
       }
     } catch (err: any) {
-      onToast("Skip question failed", "error");
+      const detail = err.response?.data?.detail || err.message || "Failed to skip question";
+      onToast(`Skip question failed: ${detail}`, "error");
     } finally {
-      setLoading(false);
+      setSkipLoading(false);
     }
   };
 
@@ -440,6 +478,8 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
       setCurrentQuestion(null);
       setFinalReport(null);
       setEvaluation(null);
+      setAdaptiveDecision(null);
+      setTrackedGaps([]);
     }
   };
 
@@ -465,14 +505,20 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
           </div>
 
           <span className="badge badge-success" style={{ marginBottom: '12px', display: 'inline-block' }}>
-            Voice Interview Completed
+            {finalReport.readiness_level ? `Readiness: ${finalReport.readiness_level}` : "Voice Interview Completed"}
           </span>
           <h1 style={{ fontSize: '2.2rem', marginBottom: '8px' }}>
             Performance Synthesis Report
           </h1>
-          <p className="text-secondary" style={{ maxWidth: '640px', margin: '0 auto 28px auto' }}>
+          <p className="text-secondary" style={{ maxWidth: '640px', margin: '0 auto 20px auto' }}>
             {finalReport.personalized_summary}
           </p>
+
+          {finalReport.readiness_estimate && (
+            <div style={{ background: 'rgba(139, 92, 246, 0.1)', borderLeft: '3px solid #8B5CF6', padding: '12px 16px', borderRadius: '8px', textAlign: 'left', maxWidth: '720px', margin: '0 auto 28px auto', color: '#C4B5FD', fontSize: '0.9rem' }}>
+              <strong>Role Readiness Assessment:</strong> {finalReport.readiness_estimate}
+            </div>
+          )}
 
           <div style={{
             display: 'grid',
@@ -483,6 +529,9 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '6px' }}>Overall Readiness</div>
               <div style={{ fontSize: '2.2rem', fontWeight: '800', color: '#10B981' }}>{finalReport.overall_score}%</div>
+              {finalReport.score_out_of_10 && (
+                <div style={{ fontSize: '0.8rem', color: '#6EE7B7' }}>{finalReport.score_out_of_10.toFixed(1)} / 10</div>
+              )}
             </div>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '6px' }}>Technical Knowledge</div>
@@ -512,28 +561,155 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
 
             <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '20px', borderRadius: '12px' }}>
               <h4 style={{ color: '#F87171', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <AlertCircle size={18} /> High-Priority Growth Areas
+                <AlertCircle size={18} /> High-Priority Growth Areas & Gaps
               </h4>
               <ul style={{ paddingLeft: '20px', color: '#D1D5DB', fontSize: '0.95rem' }}>
-                {finalReport.weak_topics.map((t, idx) => (
+                {(finalReport.skill_gaps && finalReport.skill_gaps.length > 0 ? finalReport.skill_gaps : finalReport.weak_topics).map((t, idx) => (
                   <li key={idx} style={{ marginBottom: '6px' }}>{t}</li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '12px', marginBottom: '32px' }}>
-            <h4 style={{ color: '#A78BFA', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Sparkles size={18} /> AI Interviewer Strategic Recommendations
-            </h4>
-            <ul style={{ paddingLeft: '20px', color: '#D1D5DB', fontSize: '0.95rem' }}>
-              {finalReport.recommendations.map((r, idx) => (
-                <li key={idx} style={{ marginBottom: '8px' }}>{r}</li>
-              ))}
-            </ul>
-          </div>
+          {finalReport.recommendations && finalReport.recommendations.length > 0 && (
+            <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '12px', marginBottom: '32px' }}>
+              <h4 style={{ color: '#A78BFA', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <Sparkles size={18} /> AI Interviewer Strategic Recommendations
+              </h4>
+              <ul style={{ paddingLeft: '20px', color: '#D1D5DB', fontSize: '0.95rem' }}>
+                {finalReport.recommendations.map((r, idx) => (
+                  <li key={idx} style={{ marginBottom: '8px' }}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+          {/* Question Results Breakdown */}
+          {finalReport.question_results && finalReport.question_results.length > 0 && (
+            <div style={{ textAlign: 'left', marginBottom: '32px' }}>
+              <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
+                <Award size={20} color="#8B5CF6" /> Spoken Question-by-Question Review
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {finalReport.question_results.map((qr, idx) => {
+                  const isExpanded = expandedQuestionIdx === idx;
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        background: 'rgba(17, 24, 39, 0.7)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div
+                        onClick={() => setExpandedQuestionIdx(isExpanded ? null : idx)}
+                        style={{
+                          padding: '16px 20px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          background: isExpanded ? 'rgba(31, 41, 55, 0.5)' : 'transparent'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                          <span style={{
+                            background: qr.is_skipped ? 'rgba(156, 163, 175, 0.2)' : qr.score >= 80 ? 'rgba(16, 185, 129, 0.2)' : qr.score >= 60 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                            color: qr.is_skipped ? '#9CA3AF' : qr.score >= 80 ? '#10B981' : qr.score >= 60 ? '#F59E0B' : '#EF4444',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontWeight: 700,
+                            fontSize: '13px'
+                          }}>
+                            {qr.is_skipped ? 'Skipped' : (qr.score_out_of_10 ? `${qr.score_out_of_10.toFixed(1)}/10` : `${(qr.score || 0).toFixed(0)}%`)}
+                          </span>
+                          <div>
+                            <span style={{ fontSize: '12px', color: '#9CA3AF', marginRight: '8px' }}>Q{qr.question_number} • {qr.topic}</span>
+                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#F8FAFC', marginTop: '2px' }}>{qr.question}</div>
+                          </div>
+                        </div>
+                        <div style={{ color: '#9CA3AF', marginLeft: '12px', fontSize: '12px' }}>
+                          {isExpanded ? '▲ Hide Details' : '▼ View Breakdown'}
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(11, 15, 23, 0.95)' }}>
+                          <div style={{ marginBottom: '14px' }}>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' }}>Transcribed Response:</span>
+                            <p style={{ background: 'rgba(31, 41, 55, 0.4)', padding: '12px', borderRadius: '8px', fontSize: '13px', color: '#E2E8F0', marginTop: '4px', fontStyle: 'italic', lineHeight: '1.5' }}>
+                              "{qr.user_answer || "No response provided"}"
+                            </p>
+                          </div>
+
+                          {qr.strengths && qr.strengths.length > 0 && (
+                            <div style={{ marginBottom: '12px' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#10B981' }}>Key Strengths:</span>
+                              <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
+                                {qr.strengths.map((s, sIdx) => (
+                                  <li key={sIdx} style={{ fontSize: '13px', color: '#E2E8F0' }}>{s}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {qr.missing_concepts && qr.missing_concepts.length > 0 && (
+                            <div style={{ marginBottom: '12px' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#F59E0B' }}>Missing Concepts:</span>
+                              <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
+                                {qr.missing_concepts.map((m, mIdx) => (
+                                  <li key={mIdx} style={{ fontSize: '13px', color: '#E2E8F0' }}>{m}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {qr.model_answer && (
+                            <div style={{ marginTop: '12px', background: 'rgba(99, 102, 241, 0.08)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#818CF8' }}>Benchmark Model Answer:</span>
+                              <p style={{ fontSize: '13px', color: '#E2E8F0', marginTop: '4px', lineHeight: '1.5' }}>{qr.model_answer}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '24px' }}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                const iId = interview?.id;
+                setInterview(null);
+                setFinalReport(null);
+                if (setSelectedInterviewId && iId) setSelectedInterviewId(iId);
+                setActiveTab('analysis');
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              id="voice-btn-view-analysis"
+            >
+              <Sparkles size={16} /> View Deep AI Analysis
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                const iId = interview?.id;
+                setInterview(null);
+                setFinalReport(null);
+                if (setSelectedInterviewId && iId) setSelectedInterviewId(iId);
+                setActiveTab('roadmap');
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              id="voice-btn-view-roadmap"
+            >
+              <Compass size={16} /> View Preparation Roadmap
+            </button>
             <button
               className="btn btn-secondary"
               onClick={() => {
@@ -545,7 +721,7 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
               View Analytics Dashboard
             </button>
             <button
-              className="btn btn-primary"
+              className="btn btn-secondary"
               onClick={() => {
                 setInterview(null);
                 setFinalReport(null);
@@ -763,9 +939,20 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
           <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>
             Question {questionIndex} of {interview.total_questions || totalQuestions}
           </span>
-          <span className="badge" style={{ background: 'rgba(255,255,255,0.06)', color: '#CBD5E1' }}>
+          <span className="badge" style={{
+            background: (currentQuestion?.difficulty || difficulty) === 'Hard' ? 'rgba(239, 68, 68, 0.2)' :
+                        (currentQuestion?.difficulty || difficulty) === 'Medium' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+            color: (currentQuestion?.difficulty || difficulty) === 'Hard' ? '#F87171' :
+                   (currentQuestion?.difficulty || difficulty) === 'Medium' ? '#FBBF24' : '#34D399',
+            fontWeight: '600'
+          }}>
             {currentQuestion?.difficulty || difficulty}
           </span>
+          {trackedGaps.length > 0 && (
+            <span className="badge" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#F87171', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+              {trackedGaps.length} Gaps Tracked
+            </span>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -862,8 +1049,38 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
             </div>
           </div>
 
+          {/* Adaptive Engine Indicator */}
+          {currentQuestion?.adaptive_action && currentQuestion.adaptive_action !== 'NEXT_TOPIC' && (
+            <div style={{
+              background: currentQuestion.adaptive_action === 'INCREASE_DIFFICULTY' ? 'rgba(16, 185, 129, 0.12)' :
+                          currentQuestion.adaptive_action === 'SIMPLIFY' ? 'rgba(99, 102, 241, 0.12)' :
+                          currentQuestion.adaptive_action === 'CLARIFY' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(236, 72, 153, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              color: '#F9FAFB',
+              fontSize: '0.85rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}>
+                <Zap size={14} color="#FBBF24" />
+                <span>Adaptive Strategy: {currentQuestion.adaptive_action.replace(/_/g, ' ')}</span>
+              </div>
+              {currentQuestion.assessment_objective && (
+                <div style={{ fontSize: '0.8rem', color: '#CBD5E1', marginTop: '4px' }}>
+                  <strong>Objective:</strong> {currentQuestion.assessment_objective}
+                </div>
+              )}
+              {currentQuestion.adaptation_reason && (
+                <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '2px', fontStyle: 'italic' }}>
+                  {currentQuestion.adaptation_reason}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Follow-up Probe Alert if applicable */}
-          {currentQuestion?.is_follow_up && (
+          {currentQuestion?.is_follow_up && !currentQuestion?.adaptive_action && (
             <div style={{
               background: 'rgba(245, 158, 11, 0.1)',
               border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -1130,16 +1347,25 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
               className="btn btn-secondary"
               style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
               onClick={handleSkip}
-              disabled={loading}
+              disabled={loading || skipLoading}
             >
-              <Forward size={14} /> Skip Question
+              {skipLoading ? (
+                <>
+                  <span className="loading-spinner" style={{ width: '12px', height: '12px', marginRight: '4px' }}></span>
+                  Skipping...
+                </>
+              ) : (
+                <>
+                  <Forward size={14} /> Skip Question
+                </>
+              )}
             </button>
 
             <button
               type="button"
               className="btn btn-primary"
               onClick={handleSubmitAnswer}
-              disabled={loading || isListening || !userEditedAnswer.trim()}
+              disabled={loading || skipLoading || isListening || !userEditedAnswer.trim()}
               style={{
                 padding: '12px 24px',
                 display: 'flex',
@@ -1203,6 +1429,51 @@ export const VoiceInterview: React.FC<VoiceInterviewProps> = ({
               <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#F59E0B' }}>{evaluation.completeness}%</div>
             </div>
           </div>
+
+          {/* Adaptive Intelligence Engine Decision */}
+          {adaptiveDecision && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.05))',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '10px',
+              padding: '16px 20px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Brain size={18} color="#818CF8" />
+                  <span style={{ fontWeight: '700', color: '#C7D2FE', fontSize: '0.95rem' }}>
+                    Adaptive Engine Strategy: {adaptiveDecision.action.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                <span className="badge" style={{
+                  background: 'rgba(99, 102, 241, 0.2)',
+                  color: '#A5B4FC',
+                  fontWeight: '700'
+                }}>
+                  Difficulty: {adaptiveDecision.updated_difficulty}
+                </span>
+              </div>
+              <p style={{ margin: '0 0 8px 0', fontSize: '0.88rem', color: '#E2E8F0', lineHeight: '1.5' }}>
+                <strong>Interviewer Rationale:</strong> {adaptiveDecision.decision_rationale}
+              </p>
+              {adaptiveDecision.assessment_objective && (
+                <div style={{ fontSize: '0.82rem', color: '#94A3B8' }}>
+                  <strong>Next Objective:</strong> {adaptiveDecision.assessment_objective}
+                </div>
+              )}
+              {adaptiveDecision.identified_knowledge_gaps && adaptiveDecision.identified_knowledge_gaps.length > 0 && (
+                <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#F87171', fontWeight: '600' }}>Targeted Gaps:</span>
+                  {adaptiveDecision.identified_knowledge_gaps.map((gap, idx) => (
+                    <span key={idx} className="badge" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#FCA5A5', fontSize: '0.75rem' }}>
+                      {gap}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {evaluation.communication_notes && (
             <div style={{

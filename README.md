@@ -1,4 +1,4 @@
-# InterviewAI — AI Interview Preparation Assistant
+git remote add origin # InterviewAI — AI Interview Preparation Assistant
 
 > **"Prepare smarter. Interview better."**
 > Practice with AI-powered interview questions, get instant evaluation and personalized feedback to boost your confidence and ace your next tech interview.

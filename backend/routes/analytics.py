@@ -46,8 +46,8 @@ def get_overview_analytics(
         if cs.coding_score and cs.coding_score > 0:
             all_scores.append(float(cs.coding_score))
 
-    avg_score = round(sum(all_scores) / len(all_scores), 1) if all_scores else 74.5
-    best_score = round(max(all_scores), 1) if all_scores else 86.0
+    avg_score = round(sum(all_scores) / len(all_scores), 1) if all_scores else 0.0
+    best_score = round(max(all_scores), 1) if all_scores else 0.0
 
     # Categorize by topic, difficulty, and interview type
     topic_scores: Dict[str, List[float]] = {}
@@ -76,31 +76,6 @@ def get_overview_analytics(
             diff_scores.setdefault(d, []).append(s)
             type_scores.setdefault("Coding", []).append(s)
 
-    # Intelligent curated fallbacks for clean initial charts
-    if not topic_scores:
-        topic_scores = {
-            "Java & OOP": [85.0, 88.0],
-            "Data Structures": [78.0, 82.0],
-            "Database Systems": [65.0, 72.0],
-            "Operating Systems": [62.0, 68.0],
-            "System Architecture": [74.0, 78.0]
-        }
-
-    if not diff_scores:
-        diff_scores = {
-            "Easy": [88.0, 92.0],
-            "Medium": [76.0, 82.0],
-            "Hard": [66.0, 70.0],
-            "Adaptive": [80.0, 84.0]
-        }
-
-    if not type_scores:
-        type_scores = {
-            "Technical": [82.0, 85.0],
-            "HR & Behavioral": [88.0, 90.0],
-            "Coding": [75.0, 80.0]
-        }
-
     topic_perf_list = [
         TopicPerformance(
             topic=t,
@@ -111,11 +86,9 @@ def get_overview_analytics(
     ]
     topic_perf_list.sort(key=lambda x: x.score, reverse=True)
 
-    strongest_topic = topic_perf_list[0].topic if topic_perf_list else "Java & OOP"
-    weakest_topic = topic_perf_list[-1].topic if topic_perf_list else "Database Systems"
+    strongest_topic = topic_perf_list[0].topic if topic_perf_list else "None yet"
+    weakest_topic = topic_perf_list[-1].topic if topic_perf_list else "None yet"
     weak_topics = [tp.topic for tp in topic_perf_list if tp.score < 75.0]
-    if not weak_topics and topic_perf_list:
-        weak_topics = [topic_perf_list[-1].topic]
 
     diff_perf_list = [
         DifficultyPerformance(
@@ -138,39 +111,32 @@ def get_overview_analytics(
     # Performance Trend (Last 7 sessions)
     trend_points: List[PerformanceTrendPoint] = []
     all_sessions = []
-    for i in interviews:
+    for i in completed_interviews:
         date_str = i.created_at.strftime("%Y-%m-%d") if i.created_at else "Session"
-        all_sessions.append((date_str, float(i.total_score or 72.0), i.interview_type))
-    for ci in coding_interviews:
+        all_sessions.append((date_str, float(i.total_score or 0.0), i.interview_type or "Technical"))
+    for ci in completed_coding:
         date_str = ci.created_at.strftime("%Y-%m-%d") if ci.created_at else "Session"
-        all_sessions.append((date_str, float(ci.total_score or 75.0), "Coding"))
+        all_sessions.append((date_str, float(ci.total_score or 0.0), "Coding"))
 
-    if all_sessions:
-        for idx, (dt, sc, itype) in enumerate(all_sessions[-7:]):
-            trend_points.append(PerformanceTrendPoint(
-                date=dt if dt != "Session" else f"Session {idx+1}",
-                score=round(sc, 1),
-                interview_type=itype
-            ))
-    else:
-        trend_points = [
-            PerformanceTrendPoint(date="Day 1", score=68.0, interview_type="Technical"),
-            PerformanceTrendPoint(date="Day 2", score=72.0, interview_type="Coding"),
-            PerformanceTrendPoint(date="Day 3", score=77.0, interview_type="HR"),
-            PerformanceTrendPoint(date="Day 4", score=83.0, interview_type="Technical")
-        ]
+    for idx, (dt, sc, itype) in enumerate(all_sessions[-7:]):
+        trend_points.append(PerformanceTrendPoint(
+            date=dt if dt != "Session" else f"Session {idx+1}",
+            score=round(sc, 1),
+            interview_type=itype
+        ))
 
     # Improvement index
     if len(trend_points) >= 2:
         recent_improvement = round(trend_points[-1].score - trend_points[0].score, 1)
     else:
-        recent_improvement = 5.5
+        recent_improvement = 0.0
 
-    readiness_score = min(98.0, max(42.0, round((avg_score * 0.70) + (interviews_completed_count * 3.5) + 12.0, 1)))
-    readiness_explanation = (
-        f"Your interview readiness index is calculated at {readiness_score}%. "
-        f"You excel in {strongest_topic}, but reviewing {weakest_topic} will boost your overall performance."
-    )
+    # Synchronize readiness score with ReadinessService for unified platform intelligence
+    from backend.services.readiness_service import ReadinessService
+    readiness_snap = ReadinessService.get_latest_readiness(db, current_user)
+    readiness_score = readiness_snap.overall_readiness_score
+    readiness_explanation = readiness_snap.data_sufficiency_explanation
+
 
     return OverviewAnalyticsResponse(
         interviews_completed=interviews_completed_count,

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from backend.database.database import get_db
 from backend.models import User, Interview, Answer, Evaluation, InterviewQuestion
 from backend.utils.security import get_current_user
+from backend.services.interview_service import InterviewService
 
 router = APIRouter(prefix="/api/evaluation", tags=["Evaluation"])
 
@@ -45,15 +46,50 @@ def get_interview_evaluations(
             "strengths": strengths_list,
             "improvements": improvements_list,
             "feedback": ev.feedback or "",
+            "actionable_feedback": ev.actionable_feedback or "",
             "model_answer": ev.model_answer or ""
         })
+
+    skipped_questions = db.query(InterviewQuestion).filter(
+        InterviewQuestion.interview_id == interview_id,
+        InterviewQuestion.is_skipped == True
+    ).order_by(InterviewQuestion.question_number.asc()).all()
+
+    skipped_results = [
+        {
+            "question_id": sq.id,
+            "question_number": sq.question_number,
+            "question_text": sq.question_text,
+            "category": sq.category or sq.skill or interview.topic,
+            "difficulty": sq.difficulty,
+            "is_skipped": True,
+            "status": "skipped",
+            "adaptation_reason": sq.adaptation_reason or "Question skipped by candidate."
+        }
+        for sq in skipped_questions
+    ]
+
+    if interview.status == "completed" and (interview.total_score is None or interview.total_score == 0.0) and len(evaluations) > 0:
+        interview.total_score = InterviewService.calculate_interview_final_score(db, interview.id)
+        db.commit()
+
+    session_comparison = None
+    if interview.status == "completed":
+        try:
+            from backend.services.interview_memory_service import InterviewMemoryService
+            comp = InterviewMemoryService.compare_session_to_previous(db, current_user.id, interview.id)
+            session_comparison = comp.model_dump()
+        except Exception:
+            session_comparison = None
 
     return {
         "interview_id": interview.id,
         "title": interview.title,
         "total_score": interview.total_score,
         "status": interview.status,
-        "evaluations": results
+        "evaluations": results,
+        "skipped_questions": skipped_results,
+        "session_comparison": session_comparison
     }
 
 @router.get("/answer/{answer_id}")
@@ -85,5 +121,6 @@ def get_answer_evaluation(
         "strengths": json.loads(ev.strengths) if ev.strengths else [],
         "improvements": json.loads(ev.improvements) if ev.improvements else [],
         "feedback": ev.feedback or "",
+        "actionable_feedback": ev.actionable_feedback or "",
         "model_answer": ev.model_answer or ""
     }

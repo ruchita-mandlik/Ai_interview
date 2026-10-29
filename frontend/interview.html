@@ -3,86 +3,199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Interview — InterviewAI</title>
+  <title>Live AI Interview Room — InterviewAI</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/interview.css">
+  <style>
+    /* In-page overrides for smooth ChatGPT conversational interaction */
+    .chat-typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 18px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 0 16px 16px 16px;
+      box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05);
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #818CF8;
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    .chat-complete-card {
+      background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+      border: 1.5px solid #818CF8;
+      border-radius: 16px;
+      padding: 28px 32px;
+      text-align: center;
+      margin: 20px auto;
+      max-width: 780px;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <header class="interview-header">
-    <div class="brand-logo">
-      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      <span>InterviewAI</span>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:16px;">
-      <span id="header-role-tag" class="text-muted" style="font-weight:600; font-size:0.9rem;">Technical Interview</span>
-      <div class="user-avatar" style="width:36px; height:36px;">👤</div>
-    </div>
-  </header>
-
-  <!-- Interview Body Container -->
-  <div class="interview-container">
-
-    <!-- Title & Metadata -->
-    <div>
-      <h1 id="interview-title">Technical Mock Interview</h1>
-      <p class="text-muted">Answer the questions to complete your interview</p>
-    </div>
-
-    <!-- Progress & Timer Meta Bar -->
-    <div class="interview-meta">
-      <div style="flex:1; margin-right:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span id="question-progress-text" style="font-size:0.8rem; font-weight:700; color:var(--primary);">QUESTION 1 OF 5</span>
-          <span id="difficulty-badge" class="badge badge-warning">Medium</span>
+  <div class="chat-page-layout">
+    
+    <!-- 1. Dark Navy Sidebar -->
+    <aside class="chat-sidebar" id="chat-sidebar">
+      <div>
+        <div class="chat-sidebar-header">
+          <div class="chat-brand">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span>InterviewAI</span>
+          </div>
+          <span class="chat-badge-pro">PRO</span>
         </div>
-        <div class="progress-bar-bg">
-          <div id="question-progress-fill" class="progress-bar-fill" style="width: 20%;"></div>
+
+        <!-- Session Meta Card -->
+        <div class="chat-session-info">
+          <div class="chat-session-role" id="session-role">Senior Software Engineer</div>
+          <div class="chat-session-meta">
+            <span class="chat-meta-chip active" id="session-type-chip">Technical</span>
+            <span class="chat-meta-chip" id="session-diff-chip">Medium</span>
+            <span class="chat-meta-chip" id="session-qcount-chip">5 Questions</span>
+          </div>
+        </div>
+
+        <!-- Sidebar Navigation Actions -->
+        <div class="chat-sidebar-nav">
+          <div class="chat-sidebar-section-title">Interview Controls</div>
+          
+          <button type="button" class="chat-sidebar-btn" id="sidebar-hint-btn">
+            <span>💡</span>
+            <span>Ask for Question Hint</span>
+          </button>
+
+          <button type="button" class="chat-sidebar-btn" id="sidebar-skip-btn">
+            <span>⏭️</span>
+            <span>Skip / Pass Question</span>
+          </button>
+
+          <div class="chat-sidebar-section-title" style="margin-top:16px;">Navigation</div>
+
+          <a href="dashboard.html" class="chat-sidebar-btn">
+            <span>📊</span>
+            <span>Dashboard</span>
+          </a>
+
+          <a href="interview-config.html" class="chat-sidebar-btn">
+            <span>🚀</span>
+            <span>Standard Mock Practice</span>
+          </a>
+
+          <a href="adaptive-interview.html" class="chat-sidebar-btn" style="color:#60A5FA;">
+            <span>🧠</span>
+            <span>Adaptive AI Interview</span>
+          </a>
+
+          <a href="history.html" class="chat-sidebar-btn">
+            <span>📜</span>
+            <span>Session History</span>
+          </a>
+
+          <button type="button" class="chat-sidebar-btn danger" id="sidebar-end-btn" style="margin-top:20px;">
+            <span>⏹️</span>
+            <span>End Interview Now</span>
+          </button>
         </div>
       </div>
 
-      <div class="timer-badge">
-        <span>⏱️</span>
-        <span id="timer-display">20:00</span>
+      <!-- Sidebar Footer -->
+      <div class="chat-sidebar-footer">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="chat-avatar user" id="sidebar-user-avatar" style="width:34px; height:34px; font-size:0.85rem;">U</div>
+          <div>
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;" id="sidebar-user-name">Candidate</div>
+            <div style="font-size:0.72rem; color:#64748B;">Active Session</div>
+          </div>
+        </div>
+        <button onclick="API.removeToken(); window.location.href='login.html';" style="background:none; border:none; color:#64748B; cursor:pointer; font-size:1.1rem;" title="Logout">🚪</button>
       </div>
-    </div>
+    </aside>
 
-    <!-- Question Card -->
-    <div class="question-card">
-      <div class="interviewer-tag">
-        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-        <span>AI Interviewer</span>
+    <!-- 2. Main Chat Workspace -->
+    <main class="chat-main">
+      
+      <!-- Sticky Topbar -->
+      <header class="chat-topbar">
+        <div class="chat-topbar-left">
+          <button type="button" class="chat-toggle-sidebar" id="mobile-toggle-btn" aria-label="Toggle Sidebar">
+            ☰
+          </button>
+          <div class="chat-topbar-title">
+            <span id="topbar-role-title">Technical Mock Interview</span>
+            <span style="font-size:0.75rem; background:#DCFCE7; color:#15803D; padding:2px 8px; border-radius:9999px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+              <span style="width:6px; height:6px; background:#16A34A; border-radius:50%;"></span>
+              Gemini 3.8 Flash Online
+            </span>
+          </div>
+        </div>
+
+        <div class="chat-progress-wrap">
+          <div class="chat-progress-label" id="chat-progress-text">QUESTION 1 OF 5</div>
+          <div class="chat-progress-track">
+            <div class="chat-progress-bar" id="chat-progress-bar" style="width: 20%;"></div>
+          </div>
+          <div class="chat-timer-badge">
+            <span>⏱️</span>
+            <span id="chat-timer-display">20:00</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chronological Scrollable Message Feed -->
+      <div class="chat-feed" id="chat-feed">
+        <!-- Messages are dynamically injected by js/interview.js -->
       </div>
 
-      <div class="question-text" id="question-text">
-        Loading AI interview question...
-      </div>
+      <!-- Persistent Floating Composer -->
+      <div class="chat-composer-container">
+        <div class="chat-composer-card" id="chat-composer-card">
+          <textarea 
+            id="chat-input" 
+            class="chat-textarea" 
+            placeholder="Type your answer here... Be specific with architecture decisions, trade-offs, and code logic. (Ctrl+Enter to submit)"
+            rows="2"
+          ></textarea>
 
-      <div class="question-hint" id="question-hint" style="display:none;"></div>
-    </div>
+          <div class="chat-composer-toolbar">
+            <div class="chat-composer-tools-left">
+              <span class="chat-word-count" id="chat-word-count">0 words</span>
+              <button type="button" class="chat-action-btn" id="btn-request-hint" title="Ask interviewer for guidance without penalty">
+                <span>💡</span>
+                <span>Ask for Hint</span>
+              </button>
+              <button type="button" class="chat-action-btn" id="btn-clear-input" title="Clear text">
+                <span>🧹</span>
+                <span>Clear</span>
+              </button>
+            </div>
 
-    <!-- Answer Textarea Card -->
-    <div class="answer-card">
-      <label class="form-label" for="answer-textarea" style="font-size:1.05rem;">Your Answer</label>
-      <textarea id="answer-textarea" class="form-textarea" placeholder="Type your answer here... Explain concepts clearly with suitable code snippets or real-world examples." style="min-height:180px;"></textarea>
-
-      <div class="answer-toolbar">
-        <span class="word-count" id="word-count-display">0 words</span>
-        <div style="display:flex; gap:12px;">
-          <button type="button" id="clear-btn" class="btn btn-secondary">Clear Answer</button>
-          <button type="button" id="submit-answer-btn" class="btn btn-primary">Submit Answer</button>
+            <button type="button" class="chat-submit-btn" id="btn-submit-answer">
+              <span>Submit Answer (Ctrl+↵)</span>
+              <span>→</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Bottom Step Navigation -->
-    <div class="interview-nav-footer">
-      <button type="button" id="prev-btn" class="btn btn-secondary">← Previous</button>
-      <span id="footer-page-counter" style="font-weight:600; color:var(--text-muted);">1 / 5</span>
-      <button type="button" id="next-btn" class="btn btn-secondary">Next →</button>
-    </div>
+    </main>
 
   </div>
 

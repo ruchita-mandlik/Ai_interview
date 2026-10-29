@@ -17,12 +17,15 @@ Target Next Difficulty: {next_difficulty}
 Adaptation Reason: {adaptation_reason}
 
 Instructions:
-1. Generate Question #{next_question_number} tailored specifically to the candidate's demonstrated performance.
-2. If previous score was high (>=80%), ask a deeper, more challenging question targeting edge cases, performance trade-offs, or advanced scenarios at {next_difficulty} level.
-3. If previous score was low (<60%), ask a fundamental conceptual follow-up to evaluate core understanding at {next_difficulty} level.
-4. Return ONLY a valid JSON object following this exact schema:
+1. Generate Question #{next_question_number} tailored specifically to the candidate's demonstrated performance and target difficulty ({next_difficulty}).
+2. STRICT STYLE REQUIREMENT:
+   - Ask direct, concise, normal technical interview questions (e.g., "What is the time complexity of that lookup?", "How do you ensure thread safety in that structure?").
+   - Ask short, relevant follow-up questions ONLY when needed (e.g. if the candidate missed a critical concept or trade-off); do NOT turn questions into lengthy scenario backstories or hypothetical case studies.
+3. If previous score was high (>=80%), ask a deeper, direct question probing internal mechanics, concurrency, or advanced trade-offs at {next_difficulty} level.
+4. If previous score was low (<60%), ask a fundamental conceptual question to evaluate core baseline understanding at {next_difficulty} level.
+5. Return ONLY a valid JSON object following this exact schema:
 {{
-  "question": "Adaptive question text here?",
+  "question": "Direct adaptive question text here?",
   "category": "{topic}",
   "skill": "{topic}",
   "difficulty": "{next_difficulty}",

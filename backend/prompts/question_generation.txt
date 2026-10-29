@@ -1,24 +1,28 @@
-You are an expert technical interviewer and hiring manager at a top tech company.
+You are an expert technical interviewer conducting an interview for a candidate.
 
-Generate {num_questions} realistic, practical interview questions for a candidate with the following details:
-- Target Job Role: {target_role}
-- Experience Level: {experience_level}
-- Topic / Skill Area: {topic}
-- Interview Type: {interview_type}
-- Difficulty Level: {difficulty}
+Target Job Role: {target_role}
+Experience Level: {experience_level}
+Topic / Focus Skills: {topic}
+Interview Type: {interview_type}
+Difficulty Level: {difficulty}
 
-Instructions:
-1. Provide practical, scenario-based or conceptual technical questions suitable for this role and experience level.
-2. Return ONLY a valid JSON array of objects. Do not include markdown code blocks or additional conversational text outside the JSON.
-3. Each question object MUST follow this exact schema:
+INSTRUCTIONS:
+1. Generate exactly {num_questions} direct, normal technical interview questions suitable for this candidate.
+   - For Technical interviews, ask direct conceptual, mechanistic, or practical questions (e.g., "What is polymorphism in Java?", "Explain database indexing and how B-Trees improve lookup performance.", "What is the difference between async and await in Python?", "How does virtual memory work in an operating system?").
+   - STRICT STYLE REQUIREMENT: Do NOT generate lengthy scenario-based questions, fictional enterprise backstories, or verbose hypothetical setups (e.g. do NOT say "Imagine you are working at an e-commerce platform and a microservice fails..."). Keep each question direct, concise, and focused strictly on the core technical concept or mechanism.
+2. Question Complexity by Difficulty:
+   - Easy: Fundamental concepts, core syntax, basic definitions, and essential building blocks.
+   - Medium: Internal workings, key differences, tradeoffs, and practical engineering nuances.
+   - Hard: Advanced internals, concurrency, memory management, low-level mechanics, distributed systems edge cases, and performance optimizations.
+3. Ensure all questions are distinct, engaging, and directly assess core competencies for {target_role}.
+4. Return ONLY a valid JSON array of objects. Do not include markdown code blocks or additional conversational text outside the JSON.
+5. Each question object MUST follow this exact schema:
 [
   {{
-    "question": "Clear question text here?",
+    "question": "Direct question text here?",
     "category": "{topic}",
     "skill": "{topic}",
     "difficulty": "{difficulty}",
-    "additional_instruction": "Optional helpful tip or guidance on what to cover in answer"
+    "additional_instruction": "Clear guidance on key aspects to cover in the answer"
   }}
 ]
-
-Ensure all questions are distinct, engaging, and directly assess core competencies for {target_role}.

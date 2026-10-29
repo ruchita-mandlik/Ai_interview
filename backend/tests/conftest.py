@@ -41,3 +41,17 @@ def client(db_session):
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
+
+@pytest.fixture(autouse=True)
+def reset_ai_service_state():
+    from backend.services.ai_service import AIService
+    AIService._model_cooldowns.clear()
+    AIService._model_daily_quota_info.clear()
+    AIService._last_successful_model = None
+    AIService._in_flight_tasks.clear()
+    yield
+    AIService._model_cooldowns.clear()
+    AIService._model_daily_quota_info.clear()
+    AIService._last_successful_model = None
+    AIService._in_flight_tasks.clear()
+

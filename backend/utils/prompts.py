@@ -15,11 +15,19 @@ Candidate Recent Performance:
 {performance_summary}
 
 Task:
-Generate ONE high-quality, realistic interview question appropriate for the specified candidate role, experience level, and target topic.
+Generate ONE high-quality, direct, normal technical interview question appropriate for the specified candidate role, experience level, target topic, and difficulty.
+
+STRICT STYLE REQUIREMENT:
+- For technical interviews, ask direct conceptual or mechanistic interview questions (e.g., "What is polymorphism in Java?", "Explain database indexing.", "What is the difference between async and await?").
+- STRICTLY DO NOT generate lengthy scenario-based questions, fictional enterprise backstories, or verbose hypothetical setups (e.g. do NOT say "Imagine you are working at an e-commerce company and..."). Keep the question clean, direct, and focused on the core technical concept.
+- Difficulty Complexity:
+  * Easy: Core fundamental concepts, basic definitions, language/framework syntax.
+  * Medium: Internal workings, differences between mechanisms, tradeoffs.
+  * Hard: Deep internals, concurrency, low-level mechanics, memory management, edge cases.
 
 Return ONLY a valid JSON object matching this exact schema:
 {{
-  "question": "The text of the interview question.",
+  "question": "The text of the direct interview question.",
   "topic": "{topic}",
   "difficulty": "{difficulty}",
   "question_type": "{interview_type}",
@@ -69,11 +77,12 @@ Evaluation Feedback: {evaluation_feedback}
 
 Task:
 Determine if a targeted follow-up question is appropriate to deepen the interview (e.g. if the answer was incomplete, ambiguous, or candidate missed key details).
+Ask a short, relevant follow-up question ONLY when needed. Keep it concise, direct, and focused on the specific missing technical concept or trade-off. Do NOT turn it into a lengthy scenario or case study.
 
 Return ONLY a valid JSON object matching this exact schema:
 {{
   "requires_follow_up": true,
-  "follow_up_question": "Follow-up question string...",
+  "follow_up_question": "Short direct follow-up question...",
   "topic": "{topic}",
   "difficulty": "{difficulty}",
   "expected_points": ["Point 1", "Point 2"]

@@ -22,5 +22,11 @@ class AnswerResponse(BaseModel):
     is_voice_submission: Optional[bool] = False
     audio_duration_seconds: Optional[float] = None
     submitted_at: str
+    adaptive_action: Optional[str] = None
+    decision_rationale: Optional[str] = None
+    assessment_objective: Optional[str] = None
+    current_difficulty: Optional[str] = None
+    knowledge_gaps: Optional[List[str]] = []
+    adaptive_decision: Optional[Dict[str, Any]] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="allow")

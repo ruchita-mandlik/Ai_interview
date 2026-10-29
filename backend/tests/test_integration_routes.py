@@ -52,10 +52,16 @@ def test_analytics_overview_endpoint(client, auth_header):
     assert "performance_trend" in data
     assert "readiness_score" in data
 
+@patch("backend.services.ai_service.AIService.generate_clarification_or_hint", new_callable=AsyncMock)
 @patch("backend.services.ai_service.AIService.generate_interview_questions", new_callable=AsyncMock)
 @patch("backend.services.ai_service.AIService.evaluate_candidate_answer", new_callable=AsyncMock)
 @patch("backend.services.ai_service.AIService.generate_next_adaptive_question", new_callable=AsyncMock)
-def test_spa_interview_flow(mock_adaptive_q, mock_eval, mock_gen_q, client, auth_header):
+def test_spa_interview_flow(mock_adaptive_q, mock_eval, mock_gen_q, mock_clarify, client, auth_header):
+    mock_clarify.return_value = {
+        "clarification": "Focus on horizontal scaling and partitioning strategies.",
+        "hint": "Think about partition keys and consumer group rebalancing.",
+        "focus_areas": ["Partitioning", "Offset Management", "Consumer Groups"]
+    }
     mock_gen_q.return_value = [
         {
             "question": "Explain how event-driven architecture handles scale.",
@@ -124,7 +130,19 @@ def test_spa_interview_flow(mock_adaptive_q, mock_eval, mock_gen_q, client, auth
     assert "next_question" in ans_data
     assert ans_data["next_question"]["question"] == "What happens when an event consumer fails?"
 
-    # 3. Skip question
+    # 3. Request clarification / hint for current question
+    clarify_res = client.post(
+        f"/api/interviews/{interview_id}/clarify",
+        json={"question_id": first_q_id, "query": "What focus areas should I prioritize?"},
+        headers=auth_header
+    )
+    assert clarify_res.status_code == 200
+    clarify_data = clarify_res.json()
+    assert "clarification" in clarify_data
+    assert "hint" in clarify_data
+    assert "focus_areas" in clarify_data
+
+    # 4. Skip question
     mock_adaptive_q.return_value = {
         "question": "How do you achieve idempotency in distributed transactions?",
         "category": "Consistency",
@@ -138,8 +156,39 @@ def test_spa_interview_flow(mock_adaptive_q, mock_eval, mock_gen_q, client, auth
     skip_data = skip_res.json()
     assert skip_data["question"] == "How do you achieve idempotency in distributed transactions?"
 
+@patch("backend.services.ai_service.AIService.evaluate_code", new_callable=AsyncMock)
+@patch("backend.services.ai_service.AIService.generate_preparation_plan", new_callable=AsyncMock)
 @patch("backend.services.ai_service.AIService.generate_final_report", new_callable=AsyncMock)
-def test_ai_report_and_code_eval_endpoints(mock_report, client, auth_header):
+def test_ai_report_and_code_eval_endpoints(mock_report, mock_plan, mock_eval_code, client, auth_header):
+    mock_eval_code.return_value = {
+        "correctness_score": 9.0,
+        "code_quality_score": 8.5,
+        "time_complexity": "O(N)",
+        "space_complexity": "O(1)",
+        "bugs_found": [],
+        "edge_cases_covered": ["Empty list", "Single node"],
+        "missing_edge_cases": [],
+        "optimization_suggestions": [],
+        "ideal_code_snippet": "def reverseList(head): ...",
+        "summary_feedback": "Clean iterative pointer manipulation."
+    }
+    mock_plan.return_value = {
+        "plan": [
+            {
+                "day": i,
+                "topic": f"Topic {i}",
+                "concepts": ["Concept A", "Concept B"],
+                "practice_questions": ["Question A"],
+                "difficulty": "Medium",
+                "estimated_time": "2 Hours"
+            }
+            for i in range(1, 8)
+        ],
+        "overall_readiness_assessment": "Targeted 7-day preparation plan.",
+        "recommended_topics": ["Distributed Systems", "Caching"],
+        "recommended_difficulty": "Medium",
+        "study_priorities": ["System Design"]
+    }
     # 1. Code evaluation
     code_res = client.post(
         "/api/ai/evaluate-code",

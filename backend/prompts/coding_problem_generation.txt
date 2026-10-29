@@ -1,4 +1,4 @@
-You are a Senior Technical Software Engineer and Coding Interviewer creating a production-grade LeetCode/HackerRank style coding problem.
+You are a Senior Technical Software Engineer and Coding Interviewer creating a standard Data Structures & Algorithms (DSA) coding problem.
 
 TARGET ROLE: {target_role}
 EXPERIENCE LEVEL: {experience_level}
@@ -7,27 +7,60 @@ DIFFICULTY: {difficulty}
 PROGRAMMING LANGUAGE: {language}
 
 INSTRUCTIONS:
-Generate 1 unique, highly relevant coding problem with problem description, starter code signature in {language}, input/output format, constraints, 2 sample test cases, and 2 hidden test cases.
+1. Generate 1 standard, clean Data Structures & Algorithms (DSA) coding problem suited for {target_role} ({experience_level}) in {language} for topic {topic} at {difficulty} difficulty.
+2. STRICT STYLE REQUIREMENT:
+   - Generate standard DSA problems (e.g., "Reverse a string", "Find the second-largest element in an array", "Check whether a string is a palindrome", "Find two numbers that sum to a target", "Valid Anagram", "Maximum Subarray Sum", "Merge Two Sorted Arrays").
+   - DO NOT generate lengthy scenario-based questions, fictional enterprise backstories, or verbose narrative setups (e.g., do NOT write "You are an engineer at a delivery app building an order tracking log...").
+   - The problem statement must be a direct, clear specification of the computational task.
+3. COMPLEXITY BY DIFFICULTY:
+   - Easy: Fundamental DSA problems (e.g. string reversal, palindrome check, find second largest element, count occurrences, two sum with hashmap/brute force).
+   - Medium: Classic algorithmic problems (e.g. Two Sum / Three Sum, Valid Anagram, Longest Substring Without Repeating Characters, Kadane's algorithm / Maximum Subarray, Merge Intervals, Binary Search).
+   - Hard: Advanced algorithmic challenges (e.g. Trapping Rain Water, Merge K Sorted Lists, Sliding Window Maximum, LRU Cache operations, Longest Valid Parentheses).
+4. PROBLEM SPECIFICATION REQUIREMENTS:
+   - Clear problem description stating the input, task, and rules concisely.
+   - Input/output format clearly explained.
+   - Constraints clearly stated (e.g. "1 <= nums.length <= 10^5, -10^9 <= nums[i] <= 10^9").
+   - State Expected Time Complexity and Expected Space Complexity where appropriate (e.g. "Expected Time Complexity: O(N), Expected Space Complexity: O(1)").
+   - Starter code template in {language} with standard function definition (e.g. `def solution(...)` or problem-specific function name) with docstring/comments.
+   - Exactly 2 sample test cases with input, expected_output, and explanation.
+   - Exactly 2 hidden test cases with input and expected_output covering boundary/edge cases (e.g. single element, duplicates, negative numbers).
+5. PROGRESSIVE HINTS:
+   - Provide 2 optional progressive hints that guide the candidate conceptually without giving away the solution or source code prematurely.
+   - Hint 1: High-level intuition or recommended data structure/algorithmic paradigm.
+   - Hint 2: Edge-case warning or specific traversal/pointer technique.
 
 Return ONLY a valid JSON object with the following exact keys:
 {{
-  "title": "Problem Title",
-  "description": "Comprehensive markdown problem description explaining scenario, requirement, and clear examples.",
+  "title": "Standard DSA Problem Title",
+  "description": "Clear, direct problem statement explaining the task, rules, and expected time/space complexity (e.g. Expected Time: O(N), Expected Space: O(1)). No lengthy fictional scenarios.",
   "input_format": "Description of input arguments or format",
   "output_format": "Description of expected return value or output format",
-  "constraints": "1 <= N <= 10^5, -10^9 <= arr[i] <= 10^9",
+  "constraints": "1 <= N <= 10^5, Expected Time Complexity: O(N), Expected Space Complexity: O(1)",
   "starter_code": "Language-specific starter function template with docstring / comment placeholder for candidate solution",
+  "hints": [
+    "Hint 1: Conceptual direction without giving away the answer.",
+    "Hint 2: Edge case or optimization advice."
+  ],
   "sample_test_cases": [
     {{
       "input": "[2, 7, 11, 15]\\n9",
       "expected_output": "[0, 1]",
       "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+    }},
+    {{
+      "input": "[3, 2, 4]\\n6",
+      "expected_output": "[1, 2]",
+      "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]."
     }}
   ],
   "hidden_test_cases": [
     {{
-      "input": "[3, 2, 4]\\n6",
-      "expected_output": "[1, 2]"
+      "input": "[3, 3]\\n6",
+      "expected_output": "[0, 1]"
+    }},
+    {{
+      "input": "[1, 5, 8, 3]\\n8",
+      "expected_output": "[1, 3]"
     }}
   ],
   "skill": "{topic}",
